@@ -5,6 +5,14 @@ const http = require('node:http');
 const htmlPath = require('node:path').join(__dirname, '..', 'index.html');
 const server = http.createServer((req,res) => {res.setHeader('Content-Type','text/html; charset=utf-8');let html=fs.readFileSync(htmlPath,'utf8');if(req.url.includes('legacy'))html=html.replaceAll('100dvh','invalid');res.end(html);});
 const legacy = {name:'測試',font:26,fullMarks:{'2026-11-17':{'1':'green'}},highlights:{'2026-11-17':{'1':[{start:0,end:3,color:'pink'}]}},notes:[{id:'old',date:'2026-11-17',text:'保留筆記',private:true}],checkins:{'2026-11-17':true}};
+function initialize(data){
+  const NativeDate=Date;
+  window.Date=class extends NativeDate {
+    constructor(...args){super(...(args.length?args:['2026-11-17T04:00:00Z']));}
+    static now(){return new NativeDate('2026-11-17T04:00:00Z').getTime();}
+  };
+  if(!localStorage.getItem('devotion-v04'))localStorage.setItem('devotion-v04',JSON.stringify(data));
+}
 const geometry = page => page.evaluate(() => {
   const main=document.querySelector('main'), v=document.querySelector('#verse-10'), text=v.querySelector('.vtext');
   const r=v.getBoundingClientRect(), t=text.getBoundingClientRect(), m=main.getBoundingClientRect();
@@ -18,7 +26,7 @@ const geometry = page => page.evaluate(() => {
     try {
       if(process.env.LEGACY_ONLY){
         const context=await browser.newContext({viewport:{width:390,height:664}});
-        await context.addInitScript(data=>localStorage.setItem('devotion-v04',JSON.stringify(data)),legacy);
+        await context.addInitScript(initialize,legacy);
         const page=await context.newPage();await page.goto(url+'/?legacy');
         const nav=await page.locator('.navbar').boundingBox();
         assert(nav.y+nav.height<=665,'navigation must remain visible when dvh is unsupported');
@@ -26,7 +34,7 @@ const geometry = page => page.evaluate(() => {
       }
       for(const [width,height] of [[320,664],[390,664],[490,664],[320,420],[844,390],[1024,768]]){
         const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true});
-        await context.addInitScript(data=>{if(!localStorage.getItem('devotion-v04'))localStorage.setItem('devotion-v04',JSON.stringify(data));},legacy);
+        await context.addInitScript(initialize,legacy);
         const page=await context.newPage(); const errors=[];page.on('pageerror',e=>errors.push(e.message));
         await page.goto(url);
         await page.locator('#verse-10').scrollIntoViewIfNeeded();
