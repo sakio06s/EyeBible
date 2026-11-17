@@ -1,0 +1,45 @@
+# Daily scripture operation
+
+EyeBible follows the **daily scripture range** on Taiwan Duranno's Living Life page:
+https://www.duranno.tw/livinglife/index.php/daily
+
+The updater reads only the source date and scripture range. It does not publish the source's devotional article, prayer, images or audio. Scripture text is the public-domain traditional Chinese Union Version from `seven1m/open-bibles`, pinned to commit `df3d5958933e0e1a62495fe95527b5949bb04a9f` (`chi-cuv.usfx.xml`). Attribution and provenance are included in every generated JSON record.
+
+## Schedule and deployment
+
+The GitHub Actions workflow **Update daily scripture** has three target times each day:
+
+- 00:05 Asia/Taipei: main update (16:05 UTC on the preceding UTC date).
+- 00:35 Asia/Taipei: follow-up check (16:35 UTC).
+- 04:05 Asia/Taipei: recovery check (20:05 UTC).
+
+These are scheduled start targets, not guaranteed publication deadlines. GitHub may delay or drop scheduled runs. The website updates after GitHub commits the validated files and the existing Vercel Git integration finishes deploying `main`.
+
+The workflow also runs after changes to its own file or the updater are merged to `main`, and can be started from **Actions → Update daily scripture → Run workflow**. No API keys or third-party database are needed. GitHub supplies a short-lived repository token; only the publication job has `contents: write`.
+
+## Data and validation
+
+`scripts/update_daily.py` checks that the official source's date matches the current date in Asia/Taipei, parses its reference, extracts every requested verse from the pinned Bible source, and rejects missing, duplicate or empty verses. It supports single verses, ranges, disjoint same-book ranges and ranges crossing chapters. An unsupported format fails explicitly.
+
+A successful import writes:
+
+- `data/daily/YYYY-MM-DD.json`: the immutable record of that day's reference and complete verse text.
+- `data/latest.json`: the latest complete record, used if today's publication is not ready.
+- `data/sync-status.json`: the date/reference and UTC time of the last successful validation. This changes on a successful follow-up check without changing immutable verse text.
+
+All publication files are committed together. The updater does not modify a previously published day's text or move `latest` backwards. A same-day source correction requires review so existing notes and partial highlight offsets cannot move silently onto different text.
+
+## Failures and recovery
+
+If either source is unavailable, the source date is stale/missing/ambiguous, or verse validation fails, the workflow fails and commits nothing. The old files remain available. The follow-up schedules retry later. Check **Actions → Update daily scripture** for the failed step and log, fix the source/parser problem if needed, then use **Run workflow**.
+
+GitHub can disable a public repository's schedules after 60 days without repository activity. Check the workflow is enabled if a long period passes without updates. The next successful import does not fabricate any skipped day's content; missing dates require a verified historical source and a reviewed import.
+
+## Local checks
+
+```sh
+python3 -m unittest discover -s tests -p 'test_*.py'
+python3 scripts/update_daily.py
+```
+
+For reproducible parser tests, use `--date YYYY-MM-DD`, `--source-file source.html`, `--bible-file bible.usfx.xml` and `--output temporary-directory`. Manual backfills must not replace a newer `latest.json`.

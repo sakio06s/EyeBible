@@ -49,7 +49,7 @@ jobs:
       - name: Publish validated data atomically through one commit
         shell: bash
         run: |
-          git add data/daily data/latest.json
+          git add data/daily data/latest.json data/sync-status.json
           if git diff --cached --quiet; then
             echo 'Daily scripture is already current.'
             exit 0
