@@ -37,16 +37,22 @@ const geometry = page => page.evaluate(() => {
         await context.addInitScript(initialize,legacy);
         const page=await context.newPage(); const errors=[];page.on('pageerror',e=>errors.push(e.message));
         await page.goto(url);
+        assert(!await page.locator('#selectionTools').isVisible(),'tools start closed');
+        const readingViewport=await page.locator('main').boundingBox(),navViewport=await page.locator('.navbar').boundingBox();
+        assert(Math.abs(readingViewport.y+readingViewport.height-navViewport.y)<=1,'closed tools must reserve no reading space');
         await page.locator('#verse-10').scrollIntoViewIfNeeded();
         const before=await geometry(page);
         // Tap a currently visible point; locator.tap would auto-scroll a tall verse first.
         const textBox=await page.locator('#verse-10 .vtext').boundingBox();
-        await page.touchscreen.tap(textBox.x+textBox.width/2,Math.max(83,Math.min(textBox.y+30,before.mainBottom-20)));
+        const tapY=Math.max(83,Math.min(textBox.y+30,before.mainBottom-20));
+        await page.touchscreen.tap(textBox.x+textBox.width/2,tapY);
         assert(await page.locator('#selectionTools').isVisible(),'a single tap on verse text must open tools');
         assert.deepEqual(await geometry(page),before,'opening tools must not move or scroll scripture');
         assert.equal(await page.locator('.verse[aria-pressed="true"]').count(),1,'only one verse selected');
         const dock=await page.locator('#selectionTools').boundingBox();
-        assert(dock.y>=before.mainBottom-1,'tools must be outside the scripture viewport');
+        assert(dock.y>=readingViewport.y&&dock.y+dock.height<=before.mainBottom+1,'floating tools must fit between header and navigation');
+        assert(tapY<dock.y||tapY>dock.y+dock.height,'floating tools must not cover the tapped text position');
+        assert.equal(await page.locator('#annotationDock').evaluate(e=>getComputedStyle(e).position),'fixed');
         assert(dock.x>=0&&dock.x+dock.width<=width+1,'toolbar must fit viewport');
         const buttons=await page.locator('#selectionTools button').all();
         for(const button of buttons){const r=await button.boundingBox();assert(r.x>=0&&r.x+r.width<=width+1&&r.y>=dock.y&&r.y+r.height<=dock.y+dock.height+1,'all controls must fit toolbar');}
@@ -64,6 +70,8 @@ const geometry = page => page.evaluate(() => {
         await page.getByRole('button',{name:'取消標註',exact:true}).tap();
         assert.equal(await page.locator('#verse-1 mark').count(),0,'whole-verse clear also removes legacy partial marks');
         await page.getByRole('button',{name:'粉色重點',exact:true}).tap();
+        // Close the floating popover before choosing a verse it may overlay.
+        await page.getByRole('button',{name:'關閉標註工具',exact:true}).tap();
         await page.locator('#verse-2').tap();
         assert.equal(await page.locator('.verse[aria-pressed="true"]').count(),1);
         assert.equal(await page.locator('#verse-1').getAttribute('aria-pressed'),'false');
@@ -74,6 +82,17 @@ const geometry = page => page.evaluate(() => {
         await page.locator('.navbar [data-tab="reading"]').tap();
         await page.locator('#verse-2').press('Enter');
         assert(await page.locator('#selectionTools').isVisible(),'keyboard selects a verse');
+        assert.equal(await page.evaluate(()=>document.activeElement.id),'selectionNote','keyboard activation must focus the floating tools');
+        await page.keyboard.press('Tab');await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(()=>document.activeElement.dataset.color),'yellow','keyboard can reach a color without scrolling through scripture');
+        await page.keyboard.press('Enter');
+        assert(await page.locator('#verse-2').evaluate(v=>v.classList.contains('full-yellow')),'keyboard applies a verse highlight');
+        await page.keyboard.press('Escape');
+        assert(!await page.locator('#selectionTools').isVisible(),'Escape closes floating tools');
+        assert.equal(await page.evaluate(()=>document.activeElement.id),'verse-2','Escape returns focus to the selected verse');
+        await page.locator('#verse-2').press('Enter');
+        await page.locator('main').dispatchEvent('touchmove');
+        assert(!await page.locator('#selectionTools').isVisible(),'a reading gesture closes floating tools');
         const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('devotion-v04')));
         assert.equal(saved.fullMarks['2026-11-17']['1'],'pink');assert.equal(saved.highlights['2026-11-17']['1'],undefined);
         assert.equal(saved.notes[0].text,'保留筆記');assert.equal(saved.checkins['2026-11-17'],true);
