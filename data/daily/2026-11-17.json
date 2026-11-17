@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-17",
+  "reference": "阿摩司書8:1-10",
+  "title": "今日經文",
+  "verses": [
+    {
+      "id": "AMO.8.1",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 1,
+      "reference": "阿摩司書 8:1",
+      "text": "主耶和華又指示我一件事：我看見一筐夏天的果子。"
+    },
+    {
+      "id": "AMO.8.2",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 2,
+      "reference": "阿摩司書 8:2",
+      "text": "他說：「阿摩司啊，你看見甚麼？」我說：「看見一筐夏天的果子。」耶和華說：「我民以色列的結局到了，我必不再寬恕他們。」"
+    },
+    {
+      "id": "AMO.8.3",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 3,
+      "reference": "阿摩司書 8:3",
+      "text": "主耶和華說：「那日，殿中的詩歌變為哀號；必有許多屍首在各處拋棄，無人作聲。」"
+    },
+    {
+      "id": "AMO.8.4",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 4,
+      "reference": "阿摩司書 8:4",
+      "text": "你們這些要吞喫窮乏人、使困苦人衰敗的，當聽我的話！"
+    },
+    {
+      "id": "AMO.8.5",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 5,
+      "reference": "阿摩司書 8:5",
+      "text": "你們說：月朔幾時過去，我們好賣糧；安息日幾時過去，我們好擺開麥子；賣出用小升斗，收銀用大戥子，用詭詐的天平欺哄人，"
+    },
+    {
+      "id": "AMO.8.6",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 6,
+      "reference": "阿摩司書 8:6",
+      "text": "好用銀子買貧寒人，用一雙鞋換窮乏人，將壞了的麥子賣給人。"
+    },
+    {
+      "id": "AMO.8.7",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 7,
+      "reference": "阿摩司書 8:7",
+      "text": "耶和華指着雅各的榮耀起誓說：他們的一切行為，我必永遠不忘。"
+    },
+    {
+      "id": "AMO.8.8",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 8,
+      "reference": "阿摩司書 8:8",
+      "text": "地豈不因這事震動？其上的居民不也悲哀嗎？地必全然像尼羅河漲起，如同埃及河湧上落下。"
+    },
+    {
+      "id": "AMO.8.9",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 9,
+      "reference": "阿摩司書 8:9",
+      "text": "主耶和華說：到那日，我必使日頭在午間落下，使地在白晝黑暗。"
+    },
+    {
+      "id": "AMO.8.10",
+      "book": "阿摩司書",
+      "chapter": 8,
+      "verse": 10,
+      "reference": "阿摩司書 8:10",
+      "text": "我必使你們的節期變為悲哀，歌曲變為哀歌。眾人腰束麻布，頭上光禿，使這場悲哀如喪獨生子，至終如痛苦的日子一樣。"
+    }
+  ],
+  "planSource": "https://www.duranno.tw/livinglife/index.php/daily",
+  "translation": "和合本（繁體、公版）",
+  "textSource": "https://raw.githubusercontent.com/seven1m/open-bibles/df3d5958933e0e1a62495fe95527b5949bb04a9f/chi-cuv.usfx.xml",
+  "licenseSource": "https://github.com/seven1m/open-bibles/blob/master/README.md"
+}

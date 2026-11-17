@@ -9,6 +9,7 @@ npm install --no-save --package-lock=false playwright@1.62.1
 npx playwright install --with-deps chromium webkit
 node tests/annotations.cjs
 node tests/presentation.cjs
+node tests/daily.cjs
 LEGACY_ONLY=1 node tests/annotations.cjs
 ```
 
@@ -17,3 +18,5 @@ The script serves the actual HTML from an ephemeral localhost port. It checks Ch
 WebKit tests are engine checks, not a substitute for a final check on an actual iPhone with Safari's browser bars and software keyboard.
 
 `presentation.cjs` checks the EyeBible name, visible Taiwan date (including a day boundary in another device timezone), exact sharing prompt, saved light/dark preferences, dark inputs, and legacy-note preservation in both engines.
+
+`daily.cjs` checks dated and latest-file fetching, true verse numbering, stale/offline fallback, legacy snapshot isolation, frozen note drafts across midnight, historical note navigation, delayed responses without moving the reading, and malformed or changed snapshot rejection in Chromium and WebKit. Run the importer unit suite separately with `python3 -m unittest discover -s tests -p "test_*.py"`.

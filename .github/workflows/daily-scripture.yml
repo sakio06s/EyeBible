@@ -1,0 +1,61 @@
+name: Update daily scripture
+
+on:
+  schedule:
+    # UTC 16:05/16:35/20:05 = Asia/Taipei 00:05/00:35/04:05.
+    - cron: '5,35 16 * * *'
+    - cron: '5 20 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/daily-scripture.yml'
+      - 'scripts/update_daily.py'
+  pull_request:
+    paths:
+      - '.github/workflows/daily-scripture.yml'
+      - 'scripts/update_daily.py'
+      - 'tests/test_update_daily.py'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Test importer validation and failure handling
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
+
+  publish:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: daily-scripture-publish
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Fetch and validate today's reference and public-domain scripture
+        run: python3 scripts/update_daily.py
+      - name: Publish validated data atomically through one commit
+        shell: bash
+        run: |
+          git add data/daily data/latest.json data/sync-status.json
+          if git diff --cached --quiet; then
+            echo 'Daily scripture is already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Update validated daily scripture'
+          git pull --rebase origin main
+          git push origin HEAD:main
