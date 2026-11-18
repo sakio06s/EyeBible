@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-19",
+  "reference": "阿摩司書9:7-15",
+  "title": "今日經文",
+  "verses": [
+    {
+      "id": "AMO.9.7",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 7,
+      "reference": "阿摩司書 9:7",
+      "text": "耶和華說：以色列人哪，我豈不看你們如古實人嗎？我豈不是領以色列人出埃及地，領非利士人出迦斐託，領亞蘭人出吉珥嗎？"
+    },
+    {
+      "id": "AMO.9.8",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 8,
+      "reference": "阿摩司書 9:8",
+      "text": "主耶和華的眼目察看這有罪的國，必將這國從地上滅絕，卻不將雅各家滅絕淨盡。這是耶和華說的。"
+    },
+    {
+      "id": "AMO.9.9",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 9,
+      "reference": "阿摩司書 9:9",
+      "text": "我必出令，將以色列家分散在列國中，好像用篩子篩穀，連一粒也不落在地上。"
+    },
+    {
+      "id": "AMO.9.10",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 10,
+      "reference": "阿摩司書 9:10",
+      "text": "我民中的一切罪人說：災禍必追不上我們，也迎不着我們。他們必死在刀下。"
+    },
+    {
+      "id": "AMO.9.11",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 11,
+      "reference": "阿摩司書 9:11",
+      "text": "到那日，我必建立大衛倒塌的帳幕，堵住其中的破口，把那破壞的建立起來，重新修造，像古時一樣，"
+    },
+    {
+      "id": "AMO.9.12",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 12,
+      "reference": "阿摩司書 9:12",
+      "text": "使以色列人得以東所餘剩的和所有稱為我名下的國。此乃行這事的耶和華說的。"
+    },
+    {
+      "id": "AMO.9.13",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 13,
+      "reference": "阿摩司書 9:13",
+      "text": "耶和華說：日子將到，耕種的必接續收割的；踹葡萄的必接續撒種的；大山要滴下甜酒；小山都必流奶〔原文作消化，見約珥三章十八節〕。"
+    },
+    {
+      "id": "AMO.9.14",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 14,
+      "reference": "阿摩司書 9:14",
+      "text": "我必使我民以色列被擄的歸回；他們必重修荒廢的城邑居住，栽種葡萄園，喝其中所出的酒，修造果木園，喫其中的果子。"
+    },
+    {
+      "id": "AMO.9.15",
+      "book": "阿摩司書",
+      "chapter": 9,
+      "verse": 15,
+      "reference": "阿摩司書 9:15",
+      "text": "我要將他們栽於本地，他們不再從我所賜給他們的地上拔出來。這是耶和華你的神說的。"
+    }
+  ],
+  "planSource": "https://www.duranno.tw/livinglife/index.php/daily",
+  "translation": "和合本（繁體、公版）",
+  "textSource": "https://raw.githubusercontent.com/seven1m/open-bibles/df3d5958933e0e1a62495fe95527b5949bb04a9f/chi-cuv.usfx.xml",
+  "licenseSource": "https://github.com/seven1m/open-bibles/blob/master/README.md"
+}
