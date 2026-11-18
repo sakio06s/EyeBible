@@ -50,6 +50,10 @@ const geometry = page => page.evaluate(() => {
         assert.deepEqual(await geometry(page),before,'opening tools must not move or scroll scripture');
         assert.equal(await page.locator('.verse[aria-pressed="true"]').count(),1,'only one verse selected');
         const dock=await page.locator('#selectionTools').boundingBox();
+        assert(Math.abs(dock.height-89.6)<.2,'toolbar is 20% shorter than 112px');
+        const note=await page.locator('#selectionNote').boundingBox(),clear=await page.locator('#clearMark').boundingBox();
+        assert(Math.abs(note.y-clear.y)<.1&&clear.x>=note.x+note.width,'note and delete are side by side');
+        assert(Math.abs(note.width-clear.width)<.2&&Math.abs(note.height-clear.height)<.2,'actions retain equal size');
         assert(dock.y>=readingViewport.y&&dock.y+dock.height<=before.mainBottom+1,'floating tools must fit between header and navigation');
         assert(tapY<dock.y||tapY>dock.y+dock.height,'floating tools must not cover the tapped text position');
         assert.equal(await page.locator('#annotationDock').evaluate(e=>getComputedStyle(e).position),'fixed');
@@ -82,8 +86,7 @@ const geometry = page => page.evaluate(() => {
         await page.locator('.navbar [data-tab="reading"]').tap();
         await page.locator('#verse-2').press('Enter');
         assert(await page.locator('#selectionTools').isVisible(),'keyboard selects a verse');
-        assert.equal(await page.evaluate(()=>document.activeElement.id),'selectionNote','keyboard activation must focus the floating tools');
-        await page.keyboard.press('Tab');await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(()=>document.activeElement.dataset.color),'yellow','keyboard activation focuses the first toolbar control');
         assert.equal(await page.evaluate(()=>document.activeElement.dataset.color),'yellow','keyboard can reach a color without scrolling through scripture');
         await page.keyboard.press('Enter');
         assert(await page.locator('#verse-2').evaluate(v=>v.classList.contains('full-yellow')),'keyboard applies a verse highlight');
