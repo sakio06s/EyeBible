@@ -29,3 +29,9 @@ WebKit tests are engine checks, not a substitute for a final check on an actual 
 `social.cjs` checks the real seven-day feed boundary in Taipei, private/own activity exclusion, unread persistence, inline reply drafts, Amen toggles, local member completion and glow levels 1–5, duplicate dates, missing-day decay, midnight rollover and narrow light/dark layouts.
 
 `refinements.cjs` verifies 20% smaller logo with transparent dark treatment, equal annotation buttons, concise prompts, one group composer, historical reading dates/full verse excerpts, and visible emoji pixel centering.
+
+## Account and private cloud storage
+
+`node tests/cloud-core.cjs` checks stable record encoding and three-way merging, including deletions and conflicts. `node tests/cloud-ui.cjs` uses the real locally vendored Supabase SDK with mocked Auth/PostgREST endpoints to check OTP, import consent, independent updates, conflict choices, offline retry, logout and account isolation. These tests never send real email.
+
+Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Docker container described in [cloud setup](../docs/cloud-setup.md). It rebuilds that test database schema and checks actual PostgreSQL RLS, per-user isolation and optimistic revisions. Never run the database harness against a production database.

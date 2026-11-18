@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
-const server = http.createServer((req,res) => {
+const server = http.createServer((req,res) => {if(require('./static-assets.cjs')(req,res))return;
   if(req.url.startsWith('/data/')){const date=req.url.match(/(\d{4}-\d{2}-\d{2})/)?.[1]||'2027-01-02';res.setHeader('Content-Type','application/json');return res.end(JSON.stringify({schemaVersion:1,date,reference:'約翰福音 3:11',title:'今日經文',verses:[{id:'JHN.3.11',book:'約翰福音',chapter:3,verse:11,reference:'約翰福音 3:11',text:'我們所說的是我們知道的。'}]}))}
   res.setHeader('Content-Type','text/html; charset=utf-8');
   res.end(fs.readFileSync(path.join(__dirname,'..','index.html')));
