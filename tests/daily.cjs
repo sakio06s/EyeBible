@@ -39,7 +39,7 @@ const saved=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('devotion-v0
       await page.unroute('**/data/**');
       const count=requests;
       await page.locator('#verse-1').click();await page.getByRole('button',{name:'寫筆記',exact:true}).click();
-      assert.equal(await page.locator('#modalTitle').innerText(),'約翰福音 3:11 · 我的亮光');
+      assert.equal(await page.locator('#modalTitle').innerText(),'約翰福音 3:11');
       await page.locator('#noteInput').fill('跨午夜草稿');
       await page.evaluate(()=>{window.testNow='2026-11-17T16:01:00Z';window.dispatchEvent(new Event('focus'));});
       await page.waitForFunction(()=>!document.querySelector('#loadReading').classList.contains('hidden'));
@@ -79,12 +79,14 @@ const saved=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('devotion-v0
       await second.route('**/data/**',async route=>{await held;await route.fulfill({json:fixture('2026-11-18')})});
       await second.goto(url);await second.locator('#verse-10').click();
       const before=await second.evaluate(()=>({scroll:document.querySelector('main').scrollTop,text:document.querySelector('#verses').textContent,selected:document.querySelector('.verse[aria-pressed="true"]').id}));
-      release();await second.waitForFunction(()=>!document.querySelector('#loadReading').classList.contains('hidden'));
+      release();await second.waitForFunction(()=>document.querySelector('#readingStatus').textContent.includes('新經文已備妥'));
+      assert.equal(await second.locator('#loadReading').isVisible(),false,'pending update must not cover annotation tools');
       const afterResponse=await second.evaluate(()=>({scroll:document.querySelector('main').scrollTop,text:document.querySelector('#verses').textContent,selected:document.querySelector('.verse[aria-pressed="true"]').id}));
       assert.deepEqual(afterResponse,before,'a delayed response must not move or replace an active reading');
       await second.getByRole('button',{name:'粉色重點',exact:true}).click();
       assert.equal((await saved(second)).fullMarks['2026-11-17']['10'],'pink');
       assert.equal((await saved(second)).fullMarks['2026-11-18'],undefined);
+      await second.locator('#selectionCancel').click();
       await second.locator('#loadReading').click();assert.equal(await second.locator('#verse-1 .vnum').innerText(),'3:11');
       await delayed.close();
       // Invalid and future dated records never replace the last readable snapshot.

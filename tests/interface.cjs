@@ -1,0 +1,27 @@
+const {chromium,webkit}=require('playwright');
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
+const root=path.join(__dirname,'..');
+const reading=JSON.parse(fs.readFileSync(path.join(root,'data/latest.json'),'utf8'));
+const server=http.createServer((req,res)=>{const pathname=new URL(req.url,'http://localhost').pathname;if(pathname.startsWith('/data/')){res.setHeader('Content-Type','application/json');return res.end(JSON.stringify(reading));}res.setHeader('Content-Type','text/html;charset=utf-8');res.end(fs.readFileSync(path.join(root,'index.html')));});
+(async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));for(const [name,type] of [['chromium',chromium],['webkit',webkit]]){const browser=await type.launch({headless:true});try{const context=await browser.newContext({viewport:{width:390,height:740},isMobile:true,hasTouch:true});await context.addInitScript(date=>{const NativeDate=Date;window.Date=class extends NativeDate{constructor(...args){super(...(args.length?args:[date+'T04:00:00Z']));}static now(){return new NativeDate(date+'T04:00:00Z').getTime();}};},reading.date);const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:'+server.address().port);
+assert.equal(await page.locator('#onboarding h1').innerText(),'來跟小組的大家一起每天讀聖經吧！');
+assert.equal(await page.locator('#firstName').getAttribute('placeholder'),'');
+assert.equal(await page.locator('#onboarding .eyebrow').count(),0);
+assert.equal(await page.locator('#createProfile').innerText(),'準備好了，開始吧');
+await page.locator('#firstName').fill('恩恩');await page.locator('#firstAvatars [data-avatar="🌸"]').tap();await page.locator('#createProfile').tap();
+await page.waitForFunction(()=>!document.querySelector('#readingStatus').textContent.includes('正在取得'));
+assert.equal(await page.locator('#shareBtn').count(),0);
+assert(await page.getByRole('img',{name:'EyeBible',exact:true}).isVisible());
+assert.equal(await page.locator('#reading > .eyebrow, #readingTitle, .daily-status-card').count(),0);
+const ref=await page.locator('#readingReference').boundingBox(),retry=await page.locator('#retryReading').boundingBox();assert(retry.x>=ref.x+ref.width&&Math.abs(ref.y-retry.y)<20,'small retry button belongs beside scripture title');
+assert.equal(await page.locator('.navbar [data-tab="group"]').innerText(),'♡\n小組互動');
+assert.equal(await page.locator('#checkinParticipants .checkin-member').count(),0,'no fake checkins before local completion');
+await page.locator('#checkBtn').tap();assert.equal(await page.locator('#checkinParticipants .checkin-member').count(),1);assert.match(await page.locator('#checkinParticipants').innerText(),/恩恩/);assert.equal(await page.locator('#readCount').count(),0);
+await page.locator('.navbar [data-tab="profile"]').tap();
+const photo=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=80;canvas.height=160;const c=canvas.getContext('2d');c.fillStyle='#bbccaa';c.fillRect(0,0,80,160);c.fillStyle='#557755';c.fillRect(20,40,40,80);return canvas.toDataURL('image/png').split(',')[1];});
+await page.locator('#editPhoto').setInputFiles({name:'portrait.png',mimeType:'image/png',buffer:Buffer.from(photo,'base64')});await page.locator('#profileAvatar img').waitFor();await page.locator('#saveProfile').tap();
+for(const selector of ['#topAvatar','#profileAvatar']){const box=await page.locator(selector).boundingBox(),image=await page.locator(selector+' img').boundingBox();assert(Math.abs(box.width-box.height)<1,'avatar must be a true circle');assert(Math.abs(box.x+box.width/2-image.x-image.width/2)<1&&Math.abs(box.y+box.height/2-image.y-image.height/2)<1,'photo must be centered');assert.equal(await page.locator(selector).evaluate(e=>getComputedStyle(e).borderRadius),'50%');}
+await page.locator('.navbar [data-tab="reading"]').tap();assert.equal(await page.locator('#checkinParticipants img').count(),1);await page.locator('#verse-1').tap();assert.equal(await page.locator('#selectionTitle').innerText(),reading.verses[0].reference);await page.getByRole('button',{name:'刪除標註',exact:true}).tap();await page.getByRole('button',{name:'寫筆記',exact:true}).tap();assert.equal(await page.locator('#modalTitle').innerText(),reading.verses[0].reference);await page.locator('#closeModal').tap();
+await page.locator('#checkBtn').tap();assert.equal(await page.locator('#checkinParticipants .checkin-member').count(),0,'cancelling local completion removes participant');
+assert.deepEqual(errors,[]);console.log('PASS '+name+': annotated onboarding/home changes, retry placement, real local checkins, circular uploaded photos, toolbar/modal copy');await context.close();}finally{await browser.close();}}})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>server.close());
