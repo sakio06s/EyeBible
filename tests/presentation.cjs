@@ -25,7 +25,7 @@ const server = http.createServer((req,res) => {
       });
       const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
       await page.goto('http://127.0.0.1:'+server.address().port);
-      assert.equal(await page.locator('.brand').innerText(),'EyeBible');
+      assert(await page.getByRole('img',{name:'EyeBible',exact:true}).isVisible());
       assert.equal(await page.locator('.subbrand').count(),0);
       assert.equal(await page.locator('#todayDate').getAttribute('datetime'),'2027-01-02');
       const dateBox=await page.locator('#todayDate').boundingBox();assert(dateBox.y>=63&&dateBox.y+dateBox.height<700,'today must be visible without scrolling');

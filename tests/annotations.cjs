@@ -61,13 +61,13 @@ const geometry = page => page.evaluate(() => {
         assert.deepEqual(await geometry(page),before,'marking must not move scripture');
         await page.getByRole('button',{name:'黃色重點',exact:true}).tap();
         assert(await page.locator('#verse-10').evaluate(v=>v.classList.contains('full-yellow')),'same color remains applied');
-        await page.getByRole('button',{name:'取消標註',exact:true}).tap();
+        await page.getByRole('button',{name:'刪除標註',exact:true}).tap();
         assert(!await page.locator('#verse-10').evaluate(v=>v.classList.contains('full-yellow')));
         await page.getByRole('button',{name:'關閉標註工具',exact:true}).tap();
         assert.deepEqual(await geometry(page),before,'closing tools must not move scripture');
         assert.equal(await page.locator('.verse[aria-pressed="true"]').count(),0);
         await page.locator('#verse-1').scrollIntoViewIfNeeded();await page.locator('#verse-1').tap();
-        await page.getByRole('button',{name:'取消標註',exact:true}).tap();
+        await page.getByRole('button',{name:'刪除標註',exact:true}).tap();
         assert.equal(await page.locator('#verse-1 mark').count(),0,'whole-verse clear also removes legacy partial marks');
         await page.getByRole('button',{name:'粉色重點',exact:true}).tap();
         // Close the floating popover before choosing a verse it may overlay.
