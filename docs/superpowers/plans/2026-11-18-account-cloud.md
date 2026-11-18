@@ -21,5 +21,5 @@ No service-role secrets in client or repo. Disabled by default until real public
 
 ## Task 3: Configure and enable
 - [x] Document exact Supabase project/email template/redirect/SQL setup.
-- [ ] Obtain project URL and publishable key after the user creates/selects a project; apply schema via authorized account access or user SQL setup.
+- [x] Obtain project URL and publishable key after the user creates/selects a project; apply schema via authorized account access or user SQL setup.
 - [ ] Confirm real account round-trip before enabling production login. Keep cloud changes in a draft PR until the real project is configured; production remains v0.9.2.
