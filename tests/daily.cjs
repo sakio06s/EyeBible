@@ -69,7 +69,9 @@ const saved=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('devotion-v0
       assert.match(await page.locator('#readingStatus').innerText(),/2026-11-18/);
       assert.equal(await page.locator('#verse-1 mark').innerText(),'第一節測試經文。');
       await page.evaluate(()=>{window.testNow='2026-11-18T16:01:00Z';window.dispatchEvent(new Event('focus'));});
-      await page.waitForFunction(()=>document.querySelector('#todayDate').dateTime==='2026-11-19');
+      await page.waitForFunction(()=>TODAY==='2026-11-19');
+      assert.equal(await page.locator('#todayDate').getAttribute('datetime'),'2026-11-18','offline saved reading retains its actual date');
+      assert(!((await page.locator('#todayDate').innerText()).includes('今天')));
       await page.locator('#checkBtn').click();assert.equal((await saved(page)).checkins['2026-11-19'],undefined);
       assert.deepEqual(Object.keys((await saved(page)).readings).sort(),['2026-11-17','2026-11-17~daily','2026-11-18']);
       assert.deepEqual(errors,[]);await context.close();

@@ -25,12 +25,13 @@ const server = http.createServer((req,res) => {
       });
       const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
       await page.goto('http://127.0.0.1:'+server.address().port);
+      await page.waitForFunction(()=>document.querySelector('#readingStatus').textContent.startsWith('今日經文 · 2027-01-02'));
       assert(await page.getByRole('img',{name:'EyeBible',exact:true}).isVisible());
       assert.equal(await page.locator('.subbrand').count(),0);
       assert.equal(await page.locator('#todayDate').getAttribute('datetime'),'2027-01-02');
       const dateBox=await page.locator('#todayDate').boundingBox();assert(dateBox.y>=63&&dateBox.y+dateBox.height<700,'today must be visible without scrolling');
       assert.match(await page.locator('#todayDate').innerText(),/2027.*1.*2/);
-      assert.equal(await page.locator('#noteInput').getAttribute('placeholder'),'寫下你的感動、想法或疑問，跟大家一起分享討論');
+      assert.equal(await page.locator('#noteInput').getAttribute('placeholder'),'寫下你的感動、想法或疑問');
       await page.locator('.navbar [data-tab="profile"]').tap();
       await page.getByRole('button',{name:'暗色系',exact:true}).tap();
       assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
@@ -49,9 +50,10 @@ const server = http.createServer((req,res) => {
       assert.equal(state.theme,'light');assert.equal(state.notes[0].text,'保留我的筆記');
       await page.evaluate(()=>{window.__testNow='2027-01-02T16:30:00Z';window.dispatchEvent(new Event('focus'));});
       await page.locator('.navbar [data-tab="reading"]').tap();
-      assert.equal(await page.locator('#todayDate').getAttribute('datetime'),'2027-01-03','resuming after midnight must refresh today');
+      await page.waitForFunction(()=>TODAY==='2027-01-03');
       if(await page.locator('#loadReading').isVisible())await page.locator('#loadReading').tap();
       await page.waitForFunction(()=>document.querySelector('#readingStatus').textContent.startsWith('今日經文 · 2027-01-03'));
+      assert.equal(await page.locator('#todayDate').getAttribute('datetime'),'2027-01-03','new reading shows actual date');
       await page.locator('#checkBtn').tap();
       assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('devotion-v04')).checkins['2027-01-03']),true);
       await page.locator('.navbar [data-tab="history"]').tap();
