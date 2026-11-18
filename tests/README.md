@@ -11,6 +11,7 @@ node tests/annotations.cjs
 node tests/presentation.cjs
 node tests/daily.cjs
 node tests/interface.cjs
+node tests/social.cjs
 LEGACY_ONLY=1 node tests/annotations.cjs
 ```
 
@@ -23,3 +24,5 @@ WebKit tests are engine checks, not a substitute for a final check on an actual 
 `daily.cjs` checks dated and latest-file fetching, true verse numbering, stale/offline fallback, legacy snapshot isolation, frozen note drafts across midnight, historical note navigation, delayed responses without moving the reading, and malformed or changed snapshot rejection in Chromium and WebKit. Run the importer unit suite separately with `python3 -m unittest discover -s tests -p "test_*.py"`.
 
 `interface.cjs` checks the annotated onboarding and reading-screen changes, compact retry control, local checkin names/avatars, circular centered photo uploads, and concise floating-toolbar/note titles.
+
+`social.cjs` checks the real seven-day feed boundary in Taipei, private/own activity exclusion, unread persistence, inline reply drafts, Amen toggles, local member completion and glow levels 1–5, duplicate dates, missing-day decay, midnight rollover and narrow light/dark layouts.
