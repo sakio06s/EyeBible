@@ -13,6 +13,7 @@ node tests/daily.cjs
 node tests/interface.cjs
 node tests/social.cjs
 node tests/refinements.cjs
+node tests/login-mobile.cjs
 LEGACY_ONLY=1 node tests/annotations.cjs
 ```
 
@@ -35,3 +36,5 @@ WebKit tests are engine checks, not a substitute for a final check on an actual 
 `node tests/cloud-core.cjs` checks stable record encoding and three-way merging, including deletions and conflicts. `node tests/cloud-ui.cjs` uses the real locally vendored Supabase SDK with mocked Auth/PostgREST endpoints to check OTP, import consent, independent updates, conflict choices, offline retry, logout and account isolation. These tests never send real email.
 
 Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Docker container described in [cloud setup](../docs/cloud-setup.md). It rebuilds that test database schema and checks actual PostgreSQL RLS, per-user isolation and optimistic revisions. Never run the database harness against a production database.
+
+`login-mobile.cjs` checks actual touch/keyboard entry in mobile Chromium and WebKit contexts and simulates iOS visual viewport shrink/pan. Email and OTP remain visible on short keyboard viewports without scrolling the app underneath. This is not a physical iPhone software-keyboard test.
