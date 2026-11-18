@@ -12,6 +12,7 @@ node tests/presentation.cjs
 node tests/daily.cjs
 node tests/interface.cjs
 node tests/social.cjs
+node tests/refinements.cjs
 LEGACY_ONLY=1 node tests/annotations.cjs
 ```
 
@@ -26,3 +27,5 @@ WebKit tests are engine checks, not a substitute for a final check on an actual 
 `interface.cjs` checks the annotated onboarding and reading-screen changes, compact retry control, local checkin names/avatars, circular centered photo uploads, and concise floating-toolbar/note titles.
 
 `social.cjs` checks the real seven-day feed boundary in Taipei, private/own activity exclusion, unread persistence, inline reply drafts, Amen toggles, local member completion and glow levels 1–5, duplicate dates, missing-day decay, midnight rollover and narrow light/dark layouts.
+
+`refinements.cjs` verifies 20% smaller logo with transparent dark treatment, equal annotation buttons, concise prompts, one group composer, historical reading dates/full verse excerpts, and visible emoji pixel centering.
