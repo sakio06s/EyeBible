@@ -9,6 +9,7 @@ assert.equal(await page.locator('#onboarding h1').innerText(),'來跟小組的�
 assert.equal(await page.locator('#firstName').getAttribute('placeholder'),'');
 assert.equal(await page.locator('#onboarding .eyebrow').count(),0);
 assert.equal(await page.locator('#createProfile').innerText(),'準備好了，開始吧');
+assert.equal(await page.locator('#firstAvatars .avataropt').count(),18);
 await page.locator('#firstName').fill('恩恩');await page.locator('#firstAvatars [data-avatar="🌸"]').tap();await page.locator('#createProfile').tap();
 await page.waitForFunction(()=>!document.querySelector('#readingStatus').textContent.includes('正在取得'));
 assert.equal(await page.locator('#shareBtn').count(),0);
@@ -19,6 +20,8 @@ assert.equal(await page.locator('.navbar [data-tab="group"]').innerText(),'♡\n
 assert.equal(await page.locator('#checkinParticipants .checkin-member').count(),0,'no fake checkins before local completion');
 await page.locator('#checkBtn').tap();assert.equal(await page.locator('#checkinParticipants .checkin-member').count(),1);assert.match(await page.locator('#checkinParticipants').innerText(),/恩恩/);assert.equal(await page.locator('#readCount').count(),0);
 await page.locator('.navbar [data-tab="profile"]').tap();
+assert.equal(await page.locator('#editAvatarOptions .avataropt').count(),18);
+await page.locator('#editAvatarOptions [data-avatar="🌞"]').tap();await page.locator('#saveProfile').tap();assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('devotion-v04')).avatar),'🌞');
 const photo=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=80;canvas.height=160;const c=canvas.getContext('2d');c.fillStyle='#bbccaa';c.fillRect(0,0,80,160);c.fillStyle='#557755';c.fillRect(20,40,40,80);return canvas.toDataURL('image/png').split(',')[1];});
 await page.locator('#editPhoto').setInputFiles({name:'portrait.png',mimeType:'image/png',buffer:Buffer.from(photo,'base64')});await page.locator('#profileAvatar img').waitFor();await page.locator('#saveProfile').tap();
 for(const selector of ['#topAvatar','#profileAvatar']){const box=await page.locator(selector).boundingBox(),image=await page.locator(selector+' img').boundingBox();assert(Math.abs(box.width-box.height)<1,'avatar must be a true circle');assert(Math.abs(box.x+box.width/2-image.x-image.width/2)<1&&Math.abs(box.y+box.height/2-image.y-image.height/2)<1,'photo must be centered');assert.equal(await page.locator(selector).evaluate(e=>getComputedStyle(e).borderRadius),'50%');}
