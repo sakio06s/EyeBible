@@ -40,3 +40,5 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `login-mobile.cjs` checks actual touch/keyboard entry in mobile Chromium and WebKit contexts and simulates iOS visual viewport shrink/pan. Email and OTP remain visible on short keyboard viewports without scrolling the app underneath. This is not a physical iPhone software-keyboard test.
 
 `google-login.cjs` checks Google-only mode, disabled-provider readiness messaging, retry after backend activation, minimal identity scopes, account selection and PKCE redirect parameters without contacting real Google or requesting Email OTP.
+
+`node tests/cloud-devices.cjs` opens independent Chromium and WebKit storage contexts against a shared simulated cloud API. It uses the shipped SDK and real UI to verify verse highlights, private notes and checkins arrive on the second device, independent concurrent edits survive merging, another account sees none of these records, and logout clears the displayed workspace. This is a deterministic integration test, not evidence of real Supabase account synchronization.
