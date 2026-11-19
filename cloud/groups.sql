@@ -264,3 +264,6 @@ revoke all on function public.group_read(text,date,timestamptz,uuid,uuid) from p
 grant execute on function public.group_action(text,jsonb) to authenticated;
 grant execute on function public.group_read(text,date,timestamptz,uuid,uuid) to authenticated;
 commit;
+
+-- Refresh PostgREST after adding RPCs so existing members need no invitation retry.
+notify pgrst, 'reload schema';
