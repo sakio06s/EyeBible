@@ -16,7 +16,7 @@ No service-role secrets in client or repo. Disabled by default until real public
 
 ## Task 2: Account flow and app integration
 - [x] Add disabled public config, local pinned SDK, login/sync UI and app bridge.
-- [x] Verify Email OTP/optional Google, first-account import consent, offline cache, logout and session switching with Playwright mocked Auth/PostgREST endpoints.
+- [x] Verify Google-only UI/readiness/PKCE/cancelled-attempt safety, first-account import consent, offline cache, logout and session switching; retain Email compatibility tests with mocked endpoints.
 - [x] Retain existing app regression coverage and complete independent review.
 
 ## Task 3: Configure and enable

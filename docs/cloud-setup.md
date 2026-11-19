@@ -1,74 +1,102 @@
-# EyeBible 登入與個人雲端儲存設定
+# EyeBible Google 登入與個人雲端儲存
 
-程式支援 Email 驗證碼及個人跨裝置同步。測試分支已填寫 Supabase 公開連線設定，正式網站仍使用本機紀錄。完成 Email 範本與實際登入同步測試後才正式啟用；這一階段不共享其他組員或私人筆記。
+目前採用 Google 登入。測試分支已連接 Supabase 公開設定；正式網站待真實 Google 登入與跨裝置同步驗證後才啟用。本階段僅同步個人資料，不共享其他組員或私人筆記。
 
-## 1. 建立免費專案
+Google 登入不使用 Supabase 的 Email 驗證碼寄信服務，也不要求購買自有網域。Supabase、Vercel 的免費額度仍各自適用。
 
-1. 用 Safari 開啟 https://supabase.com/dashboard ，建立 Supabase 管理帳號（可用 GitHub）。這是管理後台帳號；EyeBible 的使用者仍使用 Email 驗證碼登入。
-2. 建立免費方案的 Organization，再選 New project。
-3. 名稱輸入 `EyeBible`，產生並自行保存 Database password。區域可選 Singapore 或可用的鄰近區域。
-4. 等待專案建立完成。
+## 1. 建立 Google Cloud 專案
 
-## 2. 建立個人資料表與權限
+1. 開啟 https://console.cloud.google.com/ ，使用你的 Google 帳號登入。
+2. 在上方專案選單選擇新增專案，命名為 `EyeBible`。
+3. 本次只設定 Google Auth Platform 的 OAuth 登入，不需要啟用付費 API、建立計費帳戶或申請付費試用。
 
-1. 開啟專案的 SQL Editor → New query。
-2. 複製本儲存庫 [cloud/schema.sql](../cloud/schema.sql) 的完整內容，貼上執行。
-3. 執行成功後會有 `personal_states` 表及 `save_personal_state` 函式。SQL 可安全重跑，不會刪除既有紀錄。
+## 2. 設定 Google Auth Platform
 
-此表啟用 RLS。登入帳號只能讀自己的資料；寫入函式會根據登入身分與資料版本處理，前端不持有管理權限。
+在選好的 EyeBible 專案中，開啟 Google Auth Platform；第一次使用時按 Get started（開始設定）。若看到舊版選單，對應位置是 APIs & Services 的 OAuth consent screen 與 Credentials。
 
-## 3. 設定 Email 驗證碼
+- Branding：應用程式名稱 `EyeBible`，支援信箱及開發者聯絡信箱填你的信箱。
+- Audience：一般組員使用個人 Google 帳號，選 External（外部）。測試階段先把你要測試的 Google 信箱加入 Test users。
+- Data Access：只使用 `openid`、`userinfo.email`、`userinfo.profile` 這些基本身分範圍，不需要 Gmail、Drive 或其他 API 權限。
+- 暫不要求額外的自訂品牌／Logo 驗證。正式開放其他組員前，再確認 Audience 發布狀態及 Google 畫面提出的必要要求。
 
-1. 在 Authentication 的登入方式設定啟用 Email。
-2. 在 Email templates 的 Magic Link 與 Confirm signup 範本中，讓內文包含以下內容（新帳號及既有帳號都要能看到驗證碼）：
+## 3. 建立 OAuth 用戶端
 
-```html
-<h2>EyeBible 登入驗證碼</h2>
-<p>你的驗證碼是：<strong>{{ .Token }}</strong></p>
-<p>請回到 EyeBible 輸入驗證碼。</p>
+在 Google Auth Platform → Clients（或 Credentials → Create credentials → OAuth client ID）：
+
+- Application type：Web application。
+- 名稱：`EyeBible Web`。
+- Authorized JavaScript origins：
+
+```text
+https://eyebible.vercel.app
+https://eyebible-git-codex-account-cloud-shane-lin.vercel.app
 ```
 
-3. Authentication → URL Configuration 的 Site URL 設為 `https://eyebible.vercel.app`，Redirect URLs 加入 `https://eyebible.vercel.app/`。
-4. Supabase 內建寄信適合對專案管理員／團隊信箱測試，有收件者與寄送額度限制。開放一般組員前，需要在 Auth 設定自訂 SMTP，並確認寄件網域驗證完成。可先用管理帳號的信箱完成第一次測試。
+- Authorized redirect URIs：必須精確填入以下 Supabase 回呼網址，沒有結尾斜線。
 
-## 4. 連接網站
-
-從專案的 Connect／API 設定頁取得：
-
-- Project URL，例如 `https://你的專案編號.supabase.co`
-- Publishable key，以 `sb_publishable_` 開頭（也支援舊版 `anon` key）
-
-這兩項為瀏覽器可使用的公開設定，可提供給開發者填入 `cloud/config.js`。Database password、`sb_secret_...` 或 `service_role` key 不需要提供給網站，請勿填入此檔案。
-
-```js
-window.EYEBIBLE_CLOUD={
-  url:'https://你的專案編號.supabase.co',
-  publishableKey:'sb_publishable_你的公開金鑰',
-  authMode:'email'
-};
+```text
+https://mddbzoagloktnwoszuvj.supabase.co/auth/v1/callback
 ```
 
-提交部署後，設定頁與初次設定頁的登入按鈕會啟用。真實專案尚未設定前，不能把模擬測試通過視為已能登入。
+建立後會得到 Client ID 與 Client Secret。Client Secret 只填入 Supabase 後台，不要貼到聊天、前端程式或 GitHub。
 
-## 5. 實際驗證
+## 4. 在 Supabase 啟用 Google
 
-1. 用設定好的測試信箱取得驗證碼，回 EyeBible 輸入。
-2. 第一次登入時選擇是否匯入本機資料。未選擇前不會自動上傳。
-3. 建立一筆私人筆記並標註經文，等待顯示「已同步到雲端」。
-4. 另一個瀏覽器登入相同帳號，確認資料完整；再修改一筆並回原瀏覽器按立即同步。
-5. 登出後顯示原本的訪客資料，不應顯示只有帳號內才有的筆記。
-6. 用另一個帳號確認不能讀到第一個帳號的私人紀錄。
+進入 EyeBible 專案 → Authentication → Sign In / Providers → Google：
 
-「已同步」需要網路往返成功；離線時仍保存本機快取。兩個裝置修改同一筆資料會要求選擇版本，不直接覆寫。清除本機資料需先登出，避免把清除裝置誤當成刪除雲端紀錄。
+1. 開啟 Google 登入。
+2. 把 Google 的 Client ID 與 Client Secret 貼到對應欄位，儲存。
+3. 保留原有安全選項，不需要停用 nonce 等驗證。
+4. 確認此處顯示的 Callback URL 與 Google 用戶端的 Authorized redirect URIs 完全一致。
+
+Authentication → URL Configuration：
+
+- Site URL：`https://eyebible.vercel.app`
+- Redirect URLs 加入以下兩個完整網址：
+
+```text
+https://eyebible.vercel.app/
+https://eyebible-git-codex-account-cloud-shane-lin.vercel.app/
+```
+
+測試網址必須在允許清單內，否則登入後可能回到尚未啟用雲端的正式網站。測試版受 Vercel 存取保護，需先以部署者帳號通過 Vercel 登入。
+
+## 5. 個人資料表與公開連線設定
+
+已準備的 [cloud/schema.sql](../cloud/schema.sql) 需在 Supabase SQL Editor 執行。可重跑，不刪除既有紀錄。
+
+`personal_states` 啟用 RLS。登入帳號只能讀自己的資料，寫入函式根據 `auth.uid()` 與預期版本處理，前端沒有管理權限。
+
+`cloud/config.js` 只保存 Supabase Project URL、Publishable key 與 `authMode:'google'`。不要放 Google Client Secret、資料庫密碼或 Supabase Secret/service_role key。
+
+## 6. 實際測試
+
+1. 先使用 Safari 或 Chrome 開啟測試網站，避免某些 App 內建瀏覽器阻擋 Google 登入。
+2. 我的設定 → 登入 → 使用 Google 登入。後台未啟用時，網站會明確提示設定尚未完成，不會導向壞掉的登入端點。
+3. 選擇已加入 Google Test users 的信箱完成登入。
+4. 第一次登入選擇是否匯入本機資料；未選擇前不自動上傳。
+5. 建立私人筆記及經文標註，等顯示「已同步到雲端」。
+6. 第二個瀏覽器登入同一個 Google 帳號，確認同步；修改一筆，再回原瀏覽器按立即同步。
+7. 登出應回到原本的訪客資料，其他帳號不能看到帳號專有筆記。
+
+Google 登入不會寄送 EyeBible Email 驗證碼；Google 本身的帳號安全檢查仍依它的流程進行。發布給一般組員前需確認 Google Audience 設定及實際授權結果。
+
+## Email 驗證碼（目前不啟用）
+
+先前的 Email 入口保留於程式作相容性測試，但設定改為 Google。若未來再啟用 Email：Free 使用內建寄信時無法自訂範本；需自訂 SMTP，或使用 Supabase 提供的付費範本方案。內建寄信僅適合專案團隊測試，不能當成一般組員的正式寄信服務。
 
 ## 開發測試
 
 ```sh
 node tests/cloud-core.cjs
 node tests/cloud-ui.cjs
+node tests/login-mobile.cjs
+node tests/google-login.cjs
 ```
 
-`cloud-ui.cjs` 使用正式版本 SDK 與模擬 Auth/PostgREST 回應；不寄送真實郵件。資料庫測試使用本地隔離 PostgreSQL，不能指向正式專案：
+瀏覽器測試使用正式版本 SDK 與模擬 Auth/PostgREST/Google 導向回應，不寄送郵件，也不登入真實 Google 帳號。
+
+資料庫測試只使用本地隔離 PostgreSQL，不要指向正式專案：
 
 ```sh
 docker run --name eyebible-cloud-test --network none \

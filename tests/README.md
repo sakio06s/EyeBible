@@ -38,3 +38,5 @@ WebKit tests are engine checks, not a substitute for a final check on an actual 
 Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Docker container described in [cloud setup](../docs/cloud-setup.md). It rebuilds that test database schema and checks actual PostgreSQL RLS, per-user isolation and optimistic revisions. Never run the database harness against a production database.
 
 `login-mobile.cjs` checks actual touch/keyboard entry in mobile Chromium and WebKit contexts and simulates iOS visual viewport shrink/pan. Email and OTP remain visible on short keyboard viewports without scrolling the app underneath. This is not a physical iPhone software-keyboard test.
+
+`google-login.cjs` checks Google-only mode, disabled-provider readiness messaging, retry after backend activation, minimal identity scopes, account selection and PKCE redirect parameters without contacting real Google or requesting Email OTP.
