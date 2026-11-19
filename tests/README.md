@@ -42,3 +42,11 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `google-login.cjs` checks Google-only mode, disabled-provider readiness messaging, retry after backend activation, minimal identity scopes, account selection and PKCE redirect parameters without contacting real Google or requesting Email OTP.
 
 `node tests/cloud-devices.cjs` opens independent Chromium and WebKit storage contexts against a shared simulated cloud API. It uses the shipped SDK and real UI to verify verse highlights, private notes and checkins arrive on the second device, independent concurrent edits survive merging, another account sees none of these records, and logout clears the displayed workspace. This is a deterministic integration test, not evidence of real Supabase account synchronization.
+
+## Invite-only shared groups
+
+`sh tests/groups-db.sh` resets only the disposable `eyebible-cloud-test` database, runs private isolation tests and applies `cloud/groups.sql`. It checks 30-day expiry/rotation, membership/blocking, cross-group and anonymous denial, author/leader operations, duplicate retries/tombstones, archive retention and keyset pagination. Never use this harness against the live project.
+
+`node tests/groups-ui.cjs` runs the shipped app/group module in Chromium and WebKit with a simulated account bridge/API: create, invitation preview/join, private/public separation, replies/Amen/completions, ambiguous network delivery followed by reload/retry, dated archive pagination, and delayed responses after signout. `cloud-devices.cjs` also exercises the real shipped SDK/account subscription with the groups flag enabled. These do not replace the two-real-account acceptance steps in [group setup](../docs/groups-setup.md).
+
+`node tests/groups-edge.cjs` covers all independent review fixes: semantic scripture identity and conflicting-version isolation, group/session-bound drafts with private-draft preservation, per-operation multi-tab outboxes, delayed old-group pagination, refreshed expanded feeds, retained archive pages/replies, Taipei reply dates, photo DOM reuse and ungrouped personal checkins. `groups-db.sh` includes `groups-payload.sql` for bounded photo/unseen payloads and `groups-races.sh` for concurrent joins. SQL set-operation receipt tests prove an acknowledged-but-lost operation cannot undo a newer opposite choice.

@@ -1,10 +1,10 @@
-# EyeBible 小組共用設計（待確認）
+# EyeBible 小組共用設計（已確認）
 
 ## 使用者確認摘要
 - 已確定：組長建立小組、成員輸入邀請碼加入；留言與回覆、阿們、成員簽到和未讀數在同組內共用。
 - 已確定：互動頁顯示台灣今天及前六天的留言；舊資料保留，足跡依日期顯示當日小組討論。私人筆記和標註僅本人可見。
 - 實作提案：第一版每帳號同時加入一個小組；一般成員可退出，組長暫不提供退出或移交。
-- 實作提案：邀請碼七天有效，組長可產生新碼，舊碼立即失效。
+- 實作提案：邀請碼三十天有效，組長可產生新碼，舊碼立即失效。
 - 實作提案：加入前的筆記與簽到不會自動公開。加入後新儲存的公開分享和新簽到才會傳到目前小組；私人筆記只走個人儲存。
 - 實作提案：小組資料每二十秒及返回頁面時更新；斷線待送內容保留原小組，不會改送到另一小組。
 - 組長可移除成員及管理不當留言；被移除者需組長解除限制才能重新加入，不能拿舊邀請碼自行重入。離組後不能再讀取該組的歷史，原本公開內容留在組內。
@@ -13,7 +13,7 @@
 以下為實作與權限細節。
 
 ## Intent and confirmed requirements
-The user approved Google login and cloud storage, then explicitly chose leader-created groups with invitation-code joining. Keep the current social-style interface: shared posts at the top, members at the bottom, Amen and inline replies, unread counts on the group navigation icon. The feed shows Taipei today and the previous six dates. Older data remains in the cloud and is available through footsteps; seven days is not a deletion policy. Private notes and highlights stay private. Completed members glow at levels 1–5, consecutive completions increase the level, missed complete days decrease it.
+The user approved Google login and cloud storage, then explicitly chose leader-created groups with invitation-code joining, with invitations valid for 30 days. Keep the current social-style interface: shared posts at the top, members at the bottom, Amen and inline replies, unread counts on the group navigation icon. The feed shows Taipei today and the previous six dates. Older data remains in the cloud and is available through footsteps; seven days is not a deletion policy. Private notes and highlights stay private. Completed members glow at levels 1–5, consecutive completions increase the level, missed complete days decrease it.
 
 Cross-browser Google sign-in was reported successful. Automated private sync and database isolation tests pass; the user's real highlight/private-note/checkin roundtrip remains unconfirmed. Do not describe login success as proof of live data synchronization.
 
@@ -27,7 +27,7 @@ After login, an ungrouped account can create a named group or enter an invitatio
 
 Builder proposal: first version permits one current group per account. The database enforces this, and the UI explains it. A member can leave and join another group; the leader must retain leadership and cannot leave their group in this version. Multi-group switching and leadership transfer are deferred. Leaving/removal immediately removes access to that group's cloud history; retained posts stay with the group. Personal notes/highlights/checkins remain available to their owner.
 
-Builder proposal: invitation codes use a high-entropy random token that can be copied (not a guessable sequential ID), expire after seven days, and can be replaced by the leader. Replacing invalidates the old code. Only the leader may see or regenerate a usable code. Builder decision after independent review: leader removal creates a group-specific blocked-member record. Join checks the block inside the membership transaction, even with a valid invite; the leader can explicitly lift it from group settings, after which the person still needs a valid invitation. Voluntary departure does not create a block. Removal revokes access immediately without requiring invitation rotation. A member may share the code they were given; anyone holding a valid code can request to join after authenticating, so the UI describes it as an invitation credential. Group names are revealed only after a valid code lookup.
+Builder proposal: invitation codes use a high-entropy random token that can be copied (not a guessable sequential ID), expire after thirty days, and can be replaced by the leader. Replacing invalidates the old code. Only the leader may see or regenerate a usable code. Builder decision after independent review: leader removal creates a group-specific blocked-member record. Join checks the block inside the membership transaction, even with a valid invite; the leader can explicitly lift it from group settings, after which the person still needs a valid invitation. Voluntary departure does not create a block. Removal revokes access immediately without requiring invitation rotation. A member may share the code they were given; anyone holding a valid code can request to join after authenticating, so the UI describes it as an invitation credential. Group names are revealed only after a valid code lookup.
 
 ## What is shared
 Group public profile: chosen display name and avatar/photo only; no email addresses, Google tokens or personal settings.

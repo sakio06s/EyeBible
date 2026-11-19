@@ -8,7 +8,7 @@ const key=(...p)=>JSON.stringify(p),rows={};
 for(const [id,name] of [[A,'恩恩'],[B,'另一帳號']])rows[id]={revision:1,payload:{schemaVersion:1,records:{[key('setting','name')]:name,[key('setting','userId')]:id}}};
 const server=http.createServer((req,res)=>{
  const pathname=new URL(req.url,'http://localhost').pathname;
- if(pathname==='/cloud/config.js'){res.setHeader('Content-Type','text/javascript');return res.end('window.EYEBIBLE_CLOUD='+JSON.stringify({url:'https://devices-test.supabase.co',publishableKey:'sb_publishable_test',authMode:'google'})+';')}
+ if(pathname==='/cloud/config.js'){res.setHeader('Content-Type','text/javascript');return res.end('window.EYEBIBLE_CLOUD='+JSON.stringify({url:'https://devices-test.supabase.co',publishableKey:'sb_publishable_test',authMode:'google',groupsEnabled:true})+';')}
  if(pathname.startsWith('/data/')){res.setHeader('Content-Type','application/json');return res.end(JSON.stringify(fixture))}
  const file=pathname==='/'?'/index.html':pathname;
  if(!/^\/(index.html|assets\/eyebible.png|cloud\/[a-z0-9./-]+)$/.test(file)){res.statusCode=404;return res.end()}
@@ -32,6 +32,7 @@ const server=http.createServer((req,res)=>{
     const actor=JSON.parse(Buffer.from(req.headers().authorization.split('.')[1],'base64').toString()).sub;
     if(u.pathname.endsWith('/logout'))return route.fulfill({json:{},headers});
     assert(u.pathname.startsWith('/rest/'),'unexpected authentication request: '+u.pathname);
+    if(u.pathname.endsWith('/rpc/group_read'))return route.fulfill({json:{group:null,members:[],posts:[],unread:0},headers});
     if(u.pathname.includes('/rpc/')){
      const data=req.postDataJSON(),row=rows[actor];
      if(data.p_expected_revision!==row.revision)return route.fulfill({status:409,json:{code:'40001'},headers});
@@ -45,6 +46,7 @@ const server=http.createServer((req,res)=>{
   await first.locator('#verse-1').click();await first.locator('[data-color="yellow"]').click();await first.locator('#selectionCancel').click();
   await first.locator('#verse-1').click();await first.locator('#selectionNote').click();await first.locator('#noteInput').fill('跨瀏覽器私人筆記');await first.locator('#privateCheck').check();await first.locator('#saveNote').click();await first.locator('#checkBtn').click();
   await first.waitForFunction(()=>document.querySelector('#cloudStatus').textContent==='已同步到雲端');
+  assert.deepEqual(await first.evaluate(()=>new Promise(resolve=>{let stop;stop=EyeBibleAccount.subscribe(v=>{resolve(v);setTimeout(()=>stop(),0)})})),{userId:A,ready:true});
   const second=await device(webkit,A);
   assert.equal(await second.evaluate(()=>state.fullMarks[readingKey][1]),'yellow');
   assert.equal(await second.evaluate(()=>state.checkins[readingKey]),true);
