@@ -8,7 +8,7 @@
 - Fresh `sh tests/cloud-db.sh`: PostgreSQL 17 in the disposable `eyebible-cloud-test` container; owner isolation, anonymous denial, stale revision rejection. No live project data touched.
 
 ## Still requires a real account
-Use the preview, not production v0.9.2. Create a highlight, private note and checkin, wait for 已同步到雲端 in 我的設定, then sign into the same Google account in another browser and confirm all three. Report errors without sharing session tokens or passwords. This result is pending and is not implied by successful OAuth sign-in or the simulated tests.
+Use the preview, not production v0.9.2. Create a highlight, private note and checkin, wait for 已同步到雲端 in 我的設定, then sign into the same Google account in another browser and confirm all three. Report errors without sharing session tokens or passwords. The user subsequently confirmed item 5 (same-account cross-browser records) on 2026-11-19. This is separate from today’s scripture-source issue and from the simulated tests.
 
 ## Shared groups are a separate boundary
 Private snapshots are readable only by their owner. Do not expose them to group members. A separate group schema and explicit membership controls must publish only shared posts, replies, Amen reactions, public member identity and reading completions. Seven days is a feed filter; historical records must remain accessible through the footsteps view under the same group membership permissions. Do not silently publish historical local/individual records when joining a group.

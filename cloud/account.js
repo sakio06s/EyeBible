@@ -10,7 +10,7 @@ const remove=key=>{try{localStorage.removeItem(key)}catch(_){}};
 const owner=()=>read(OWNER);
 const accountListeners=new Set();let announcedSession='';
 function announceSession(){const view={userId:user?.id||null,ready:!!user&&ready&&!pendingImport},key=JSON.stringify(view);if(key===announcedSession)return;announcedSession=key;for(const fn of accountListeners)fn(view)}
-window.EyeBibleAccount={subscribe(fn){accountListeners.add(fn);fn({userId:user?.id||null,ready:!!user&&ready&&!pendingImport});return()=>accountListeners.delete(fn)},request(name,data){if(!['group_action','group_read'].includes(name)||!user||!ready||pendingImport)return Promise.reject(new Error('Account unavailable'));return request('rpc/'+name,data,epoch)}};
+window.EyeBibleAccount={subscribe(fn){accountListeners.add(fn);fn({userId:user?.id||null,ready:!!user&&ready&&!pendingImport});return()=>accountListeners.delete(fn)},request(name,data){if(!['group_action','group_read','group_feed'].includes(name)||!user||!ready||pendingImport)return Promise.reject(new Error('Account unavailable'));return request('rpc/'+name,data,epoch)}};
 window.dispatchEvent(new Event('eyebible-account-ready'));
 app.onReset(()=>{try{for(const key of Object.keys(localStorage))if(key.startsWith('eyebible.cloud.')||key.startsWith('eyebible.auth.v1')||key.startsWith('eyebible.group.'))localStorage.removeItem(key)}catch(_){app.notice('請到瀏覽器設定清除這個網站的儲存資料')}});
 const status=text=>{$('cloudStatus').textContent=text};

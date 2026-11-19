@@ -32,7 +32,7 @@ const server=http.createServer((req,res)=>{
     const actor=JSON.parse(Buffer.from(req.headers().authorization.split('.')[1],'base64').toString()).sub;
     if(u.pathname.endsWith('/logout'))return route.fulfill({json:{},headers});
     assert(u.pathname.startsWith('/rest/'),'unexpected authentication request: '+u.pathname);
-    if(u.pathname.endsWith('/rpc/group_read'))return route.fulfill({json:{group:null,members:[],posts:[],unread:0},headers});
+    if(u.pathname.endsWith('/rpc/group_read')||u.pathname.endsWith('/rpc/group_feed'))return route.fulfill({json:{group:null,members:[],posts:[],unread:0},headers});
     if(u.pathname.includes('/rpc/')){
      const data=req.postDataJSON(),row=rows[actor];
      if(data.p_expected_revision!==row.revision)return route.fulfill({status:409,json:{code:'40001'},headers});

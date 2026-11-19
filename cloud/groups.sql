@@ -25,13 +25,28 @@ create table if not exists public.eyebible_replies(
  author jsonb not null,text text not null check(length(text) between 1 and 2000),created_at timestamptz not null default clock_timestamp(),deleted_at timestamptz
 );
 create index if not exists eyebible_replies_post on public.eyebible_replies(post_id,created_at,id);
+alter table public.eyebible_posts add column if not exists last_reply_at timestamptz;
+create table if not exists public.eyebible_reply_reactions(reply_id uuid not null references public.eyebible_replies(id),user_id uuid not null references auth.users(id) on delete cascade,primary key(reply_id,user_id));
+create index if not exists eyebible_posts_activity on public.eyebible_posts(group_id,(last_reply_at is not null) desc,(coalesce(last_reply_at,created_at)) desc,id desc) where deleted_at is null;
+create index if not exists eyebible_active_reply_activity on public.eyebible_replies(post_id,created_at desc,id) where deleted_at is null;
+create or replace function public.eyebible_reply_activity() returns trigger language plpgsql security definer set search_path=pg_catalog,public as $$
+declare target uuid;begin
+ target:=case when TG_OP='DELETE' then OLD.post_id else NEW.post_id end;
+ update public.eyebible_posts set last_reply_at=(select max(created_at) from public.eyebible_replies where post_id=target and deleted_at is null) where id=target;
+ if TG_OP='UPDATE' and OLD.post_id<>NEW.post_id then update public.eyebible_posts set last_reply_at=(select max(created_at) from public.eyebible_replies where post_id=OLD.post_id and deleted_at is null) where id=OLD.post_id;end if;
+ return null;
+end $$;
+revoke all on function public.eyebible_reply_activity() from public,anon,authenticated;
+create or replace trigger eyebible_reply_activity after insert or update or delete on public.eyebible_replies for each row execute function public.eyebible_reply_activity();
+-- Backfill existing discussion activity without changing post/reply text or timestamps.
+update public.eyebible_posts pp set last_reply_at=(select max(rr.created_at) from public.eyebible_replies rr where rr.post_id=pp.id and rr.deleted_at is null);
 create table if not exists public.eyebible_reactions(post_id uuid not null references public.eyebible_posts(id),user_id uuid not null references auth.users(id) on delete cascade,primary key(post_id,user_id));
 create table if not exists public.eyebible_completions(group_id uuid not null references public.eyebible_groups(id),user_id uuid not null references auth.users(id) on delete cascade,date date not null,primary key(group_id,user_id,date));
 create table if not exists public.eyebible_seen(group_id uuid not null references public.eyebible_groups(id),user_id uuid not null references auth.users(id) on delete cascade,activity text not null check(length(activity)<=42),primary key(group_id,user_id,activity));
 create table if not exists public.eyebible_operations(user_id uuid not null references auth.users(id) on delete cascade,operation_id uuid not null,group_id uuid not null references public.eyebible_groups(id),action text not null,primary key(user_id,operation_id));
 -- Browser access is exclusively through the two narrow RPCs; no direct table privileges.
 do $$ declare t text; begin
- foreach t in array array['eyebible_groups','eyebible_members','eyebible_blocks','eyebible_posts','eyebible_replies','eyebible_reactions','eyebible_completions','eyebible_seen','eyebible_operations'] loop
+ foreach t in array array['eyebible_groups','eyebible_members','eyebible_blocks','eyebible_posts','eyebible_replies','eyebible_reactions','eyebible_reply_reactions','eyebible_completions','eyebible_seen','eyebible_operations'] loop
  execute format('alter table public.%I enable row level security',t);
  execute format('revoke all on public.%I from public,anon,authenticated',t);
  end loop;
@@ -145,8 +160,15 @@ begin
    insert into public.eyebible_replies(id,post_id,author_id,author,text) values(operation,p.id,actor,jsonb_build_object('name',m.name,'avatar',m.avatar,'image',''),trim(p_data->>'text')) on conflict(id) do nothing;
    if not exists(select 1 from public.eyebible_replies where id=operation and post_id=p.id and author_id=actor) then raise exception 'Operation ID belongs to another author' using errcode='42501'; end if;
   elsif p_action='amen' then
-   if (p_data->>'active')::boolean then insert into public.eyebible_reactions values(p.id,actor) on conflict do nothing;
-   else delete from public.eyebible_reactions where post_id=p.id and user_id=actor; end if;
+   if p_data ? 'reply_id' then
+    select * into r from public.eyebible_replies where id=(p_data->>'reply_id')::uuid and post_id=p.id and deleted_at is null;
+    if not found then raise exception 'Shared reply unavailable' using errcode='42501';end if;
+    if (p_data->>'active')::boolean then insert into public.eyebible_reply_reactions values(r.id,actor) on conflict do nothing;
+    else delete from public.eyebible_reply_reactions where reply_id=r.id and user_id=actor;end if;
+   else
+    if (p_data->>'active')::boolean then insert into public.eyebible_reactions values(p.id,actor) on conflict do nothing;
+    else delete from public.eyebible_reactions where post_id=p.id and user_id=actor;end if;
+   end if;
   elsif p_action='delete' then
    if p_data ? 'reply_id' then
     update public.eyebible_replies set deleted_at=now() where id=(p_data->>'reply_id')::uuid and post_id=p.id and (author_id=actor or g.owner_id=actor);
@@ -159,6 +181,23 @@ begin
  return jsonb_build_object('ok',true);
 end $$;
 
+-- One bounded, shared payload for both chronological archives and the activity wall.
+create or replace function public.eyebible_post_payload(p_id uuid,p_group uuid,p_actor uuid)
+returns jsonb language sql stable set search_path=pg_catalog,public as $$
+ select jsonb_build_object('id',pp.id,'authorId',pp.author_id,'name',coalesce(mm.name,pp.author->>'name','已離開的成員'),'avatar',coalesce(mm.avatar,pp.author->>'avatar','🌿'),'image','','text',pp.text,'reference',pp.reference,'quote',pp.quote,'reading',pp.reading,'verse',pp.verse,'createdAt',pp.created_at,'date',(pp.created_at at time zone 'Asia/Taipei')::date,'lastActivity',coalesce(pp.last_reply_at,pp.created_at),'hasReplies',pp.last_reply_at is not null,
+ 'likes',(select count(*) from public.eyebible_reactions where post_id=pp.id),'liked',exists(select 1 from public.eyebible_reactions where post_id=pp.id and user_id=p_actor),
+ 'replyCount',(select count(*) from public.eyebible_replies where post_id=pp.id and deleted_at is null),
+ 'replies',coalesce((select jsonb_agg(to_jsonb(r) order by r."createdAt",r.id) from (
+  select rr.id,rr.author_id as "authorId",coalesce(rm.name,rr.author->>'name') as name,coalesce(rm.avatar,rr.author->>'avatar') as avatar,''::text as image,rr.text,rr.created_at as "createdAt",(select count(*) from public.eyebible_reply_reactions where reply_id=rr.id) as likes,exists(select 1 from public.eyebible_reply_reactions where reply_id=rr.id and user_id=p_actor) as liked
+  from public.eyebible_replies rr left join public.eyebible_members rm on rm.user_id=rr.author_id and rm.group_id=p_group where rr.post_id=pp.id and rr.deleted_at is null order by rr.created_at,rr.id limit 100
+ )r),'[]'::jsonb),
+ 'unseen',coalesce((select jsonb_agg(activity) from (
+  select 'post:'||pp.id::text as activity where not exists(select 1 from public.eyebible_seen where group_id=p_group and user_id=p_actor and activity='post:'||pp.id::text)
+  union all select 'reply:'||rr.id::text from (select id from public.eyebible_replies where post_id=pp.id and deleted_at is null order by created_at,id limit 100)rr where not exists(select 1 from public.eyebible_seen where group_id=p_group and user_id=p_actor and activity='reply:'||rr.id::text)
+ )s),'[]'::jsonb))
+ from public.eyebible_posts pp left join public.eyebible_members mm on mm.user_id=pp.author_id and mm.group_id=p_group where pp.id=p_id and pp.group_id=p_group and pp.deleted_at is null;
+$$;
+revoke all on function public.eyebible_post_payload(uuid,uuid,uuid) from public,anon,authenticated;
 create or replace function public.group_read(p_mode text default 'overview',p_day date default null,p_before timestamptz default null,p_before_id uuid default null,p_post_id uuid default null)
 returns jsonb language plpgsql security definer set search_path=pg_catalog,public as $$
 declare actor uuid:=auth.uid(); g public.eyebible_groups; start_at timestamptz; end_at timestamptz; posts jsonb:='[]'; members jsonb; blocked jsonb; unread integer; next_cursor jsonb; extra boolean;
@@ -174,31 +213,16 @@ begin
  if p_mode='replies' then
   if not exists(select 1 from public.eyebible_posts where id=p_post_id and group_id=g.id and deleted_at is null) then raise exception 'Shared post unavailable' using errcode='42501'; end if;
   select coalesce(jsonb_agg(to_jsonb(q) order by q."createdAt",q.id),'[]'::jsonb) into posts from (
-   select rr.id,rr.author_id as "authorId",rr.author->>'name' as name,rr.author->>'avatar' as avatar,''::text as image,rr.text,rr.created_at as "createdAt",not exists(select 1 from public.eyebible_seen where group_id=g.id and user_id=actor and activity='reply:'||rr.id::text) as unseen
+   select rr.id,rr.author_id as "authorId",rr.author->>'name' as name,rr.author->>'avatar' as avatar,''::text as image,rr.text,rr.created_at as "createdAt",(select count(*) from public.eyebible_reply_reactions where reply_id=rr.id) as likes,exists(select 1 from public.eyebible_reply_reactions where reply_id=rr.id and user_id=actor) as liked,not exists(select 1 from public.eyebible_seen where group_id=g.id and user_id=actor and activity='reply:'||rr.id::text) as unseen
    from public.eyebible_replies rr where rr.post_id=p_post_id and rr.deleted_at is null and (p_before is null or (rr.created_at,rr.id)>(p_before,coalesce(p_before_id,'00000000-0000-0000-0000-000000000000'::uuid))) order by rr.created_at,rr.id limit 101
   )q;
   extra:=jsonb_array_length(posts)>100;posts:=case when extra then posts-100 else posts end;
   return jsonb_build_object('group_id',g.id,'replies',posts,'more',extra);
  end if;
  if p_mode<>'overview' then
-  select coalesce(jsonb_agg(to_jsonb(q) order by q."createdAt" desc,q.id desc),'[]'::jsonb) into posts from (
-   select pp.id,pp.author_id as "authorId",coalesce(mm.name,pp.author->>'name','已離開的成員') as name,coalesce(mm.avatar,pp.author->>'avatar','🌿') as avatar,''::text as image,
-    pp.text,pp.reference,pp.quote,pp.reading,pp.verse,pp.created_at as "createdAt",(pp.created_at at time zone 'Asia/Taipei')::date as date,
-    (select count(*) from public.eyebible_reactions where post_id=pp.id) as likes,
-    exists(select 1 from public.eyebible_reactions where post_id=pp.id and user_id=actor) as liked,
-    (select count(*) from public.eyebible_replies where post_id=pp.id and deleted_at is null) as "replyCount",
-    coalesce((select jsonb_agg(to_jsonb(r) order by r."createdAt",r.id) from (
-     select rr.id,rr.author_id as "authorId",coalesce(rm.name,rr.author->>'name') as name,coalesce(rm.avatar,rr.author->>'avatar') as avatar,''::text as image,rr.text,rr.created_at as "createdAt"
-     from public.eyebible_replies rr left join public.eyebible_members rm on rm.user_id=rr.author_id and rm.group_id=g.id where rr.post_id=pp.id and rr.deleted_at is null order by rr.created_at,rr.id limit 100
-    )r),'[]'::jsonb) as replies,
-    coalesce((select jsonb_agg(activity) from (
-     select 'post:'||pp.id::text as activity where not exists(select 1 from public.eyebible_seen where group_id=g.id and user_id=actor and activity='post:'||pp.id::text)
-     union all select 'reply:'||rr.id::text from (select id from public.eyebible_replies where post_id=pp.id and deleted_at is null order by created_at,id limit 100)rr where not exists(select 1 from public.eyebible_seen where group_id=g.id and user_id=actor and activity='reply:'||rr.id::text)
-    )s),'[]'::jsonb) as unseen
-   from public.eyebible_posts pp left join public.eyebible_members mm on mm.user_id=pp.author_id and mm.group_id=g.id
-   where pp.group_id=g.id and pp.deleted_at is null and pp.created_at>=start_at and pp.created_at<end_at
-    and (p_before is null or (pp.created_at,pp.id)<(p_before,coalesce(p_before_id,'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid)))
-   order by pp.created_at desc,pp.id desc limit 21
+  select coalesce(jsonb_agg(public.eyebible_post_payload(q.id,g.id,actor) order by q.created_at desc,q.id desc),'[]'::jsonb) into posts from (
+   select pp.id,pp.created_at from public.eyebible_posts pp where pp.group_id=g.id and pp.deleted_at is null and pp.created_at>=start_at and pp.created_at<end_at
+    and (p_before is null or (pp.created_at,pp.id)<(p_before,coalesce(p_before_id,'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid))) order by pp.created_at desc,pp.id desc limit 21
   )q;
   extra:=jsonb_array_length(posts)>20;posts:=case when extra then posts-20 else posts end;
   if extra then next_cursor:=jsonb_build_object('time',posts->19->>'createdAt','id',posts->19->>'id');end if;
@@ -206,12 +230,35 @@ begin
  select coalesce(jsonb_agg(jsonb_build_object('id',mm.user_id,'name',mm.name,'avatar',mm.avatar,'image',mm.image,'dates',coalesce((select jsonb_agg(cc.date order by cc.date) from public.eyebible_completions cc where cc.group_id=g.id and cc.user_id=mm.user_id),'[]'::jsonb)) order by mm.joined_at),'[]'::jsonb) into members from public.eyebible_members mm where mm.group_id=g.id;
  select coalesce(jsonb_agg(jsonb_build_object('id',bb.user_id,'name',bb.name)),'[]'::jsonb) into blocked from public.eyebible_blocks bb where bb.group_id=g.id and g.owner_id=actor;
  select count(*) into unread from (
-  select 'post:'||pp.id::text as activity from public.eyebible_posts pp where pp.group_id=g.id and pp.deleted_at is null and pp.author_id is distinct from actor and pp.created_at>=((now() at time zone 'Asia/Taipei')::date-6)::timestamp at time zone 'Asia/Taipei'
+  select 'post:'||pp.id::text as activity from public.eyebible_posts pp where pp.group_id=g.id and pp.deleted_at is null and pp.author_id is distinct from actor
   union all
-  select 'reply:'||rr.id::text from public.eyebible_replies rr join public.eyebible_posts pp on pp.id=rr.post_id where pp.group_id=g.id and pp.deleted_at is null and rr.deleted_at is null and rr.author_id is distinct from actor and pp.created_at>=((now() at time zone 'Asia/Taipei')::date-6)::timestamp at time zone 'Asia/Taipei'
+  select 'reply:'||rr.id::text from public.eyebible_replies rr join public.eyebible_posts pp on pp.id=rr.post_id where pp.group_id=g.id and pp.deleted_at is null and rr.deleted_at is null and rr.author_id is distinct from actor
  )s where not exists(select 1 from public.eyebible_seen where group_id=g.id and user_id=actor and activity=s.activity);
  return jsonb_build_object('group',jsonb_build_object('id',g.id,'name',g.name,'owner_id',g.owner_id)||case when g.owner_id=actor then jsonb_build_object('invite_code',g.invite_code,'invite_expires_at',g.invite_expires_at) else '{}'::jsonb end,'members',members,'blocked',blocked,'posts',posts,'next',next_cursor,'unread',unread);
 end $$;
+create or replace function public.group_feed(p_cursor jsonb default null)
+returns jsonb language plpgsql security definer set search_path=pg_catalog,public as $$
+declare actor uuid:=auth.uid();overview jsonb;gid uuid;rows jsonb;extra boolean;cursor_time timestamptz;cursor_id uuid;cursor_replied boolean;next_cursor jsonb;
+begin
+ if actor is null then raise exception 'Authentication required' using errcode='42501';end if;
+ overview:=public.group_read('overview');
+ if overview->'group'='null'::jsonb then return overview||jsonb_build_object('next',null);end if;
+ gid:=(overview->'group'->>'id')::uuid;
+ if p_cursor is not null and p_cursor<>'null'::jsonb then
+  if jsonb_typeof(p_cursor)<>'object' or octet_length(p_cursor::text)>1024 or jsonb_typeof(p_cursor->'replied') is distinct from 'boolean' then raise exception 'Invalid wall cursor' using errcode='22023';end if;
+  begin cursor_time:=(p_cursor->>'time')::timestamptz;cursor_id:=(p_cursor->>'id')::uuid;cursor_replied:=(p_cursor->>'replied')::boolean;exception when others then raise exception 'Invalid wall cursor' using errcode='22023';end;
+  if cursor_time is null or cursor_id is null then raise exception 'Invalid wall cursor' using errcode='22023';end if;
+ end if;
+ select coalesce(jsonb_agg(public.eyebible_post_payload(q.id,gid,actor) order by q.replied desc,q.activity desc,q.id desc),'[]'::jsonb) into rows from (
+  select pp.id,pp.last_reply_at is not null as replied,coalesce(pp.last_reply_at,pp.created_at) as activity from public.eyebible_posts pp where pp.group_id=gid and pp.deleted_at is null
+   and (cursor_time is null or (pp.last_reply_at is not null,coalesce(pp.last_reply_at,pp.created_at),pp.id)<(cursor_replied,cursor_time,cursor_id))
+  order by (pp.last_reply_at is not null) desc,coalesce(pp.last_reply_at,pp.created_at) desc,pp.id desc limit 11
+ )q;
+ extra:=jsonb_array_length(rows)>10;if extra then rows:=rows-10;next_cursor:=jsonb_build_object('time',rows->9->>'lastActivity','id',rows->9->>'id','replied',rows->9->'hasReplies');end if;
+ return overview||jsonb_build_object('posts',rows,'next',next_cursor);
+end $$;
+revoke all on function public.group_feed(jsonb) from public,anon;
+grant execute on function public.group_feed(jsonb) to authenticated;
 revoke all on function public.group_action(text,jsonb) from public,anon;
 revoke all on function public.group_read(text,date,timestamptz,uuid,uuid) from public,anon;
 grant execute on function public.group_action(text,jsonb) to authenticated;

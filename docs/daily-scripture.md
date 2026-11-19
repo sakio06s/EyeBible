@@ -43,3 +43,7 @@ python3 scripts/update_daily.py
 ```
 
 For reproducible parser tests, use `--date YYYY-MM-DD`, `--source-file source.html`, `--bible-file bible.usfx.xml` and `--output temporary-directory`. Manual backfills must not replace a newer `latest.json`.
+
+## Vercel 測試分支的即時資料
+
+每日排程只發布到 main；測試分支的靜態 JSON 不會跟著更新。因此標準 `eyebible-*.vercel.app` 測試網址改讀同源 `/api/scripture?date=YYYY-MM-DD`，由 Vercel Node 函式讀取 main 中已驗證的每日 JSON。最新可用資料使用 `/api/scripture`，固定來源、日期格式驗證、1 MiB 回應上限與 8 秒逾時，沒有金鑰或任意 URL 代理。正式網址及本機測試仍使用靜態 `/data` 路徑。資料未發布或網路失敗時保留已存經文與原日期的標註，不把舊經文改標為今天。
