@@ -56,3 +56,5 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `feed-five-ui.cjs`：Chromium／WebKit 觸控模式驗證淺／暗色阿們透明、SVG／留言節點與捲動保持、鍵盤焦點、5→10→15 明確按鈕追加、小組設定位置、自己回覆與背景輪詢置頂（含舊讀取與新回覆重疊）。`feed-ten-ui.cjs` 保留為同一測試的相容入口；資料庫的十筆游標仍由 `feed-ten.sql` 驗證。
 
 `pull-refresh.cjs`：取消5000ms輪詢；阿們與回覆的數字間距；頂端下拉72px放開更新；短拉／橫向／多指／取消／收回／最後touchend座標與觸點／放開時已離開頂端；編輯與其他分頁不攔截；更新中合併、失敗保留／重試、已展開數量保留。Chromium以原生CDP觸控補驗，WebKit使用合成Touch Events驗證狀態機。
+
+`composers-feedback.cjs` 驗證固定發文列、獨立純文字分享、無經文與重載隔離、等距按鈕、私人讀經筆記、小組標題、回報表單與固定重試內容。`feedback-api.cjs` 用假的Auth／寄信回應驗證伺服器權限、隱藏固定收件者、純文字／長度／識別碼、去重、限流與失敗。`feedback-auth.cjs` 使用實際帳號模組及SDK fixtures，驗證各帳號Bearer與登出後的回報草稿／回應隔離。這些測試不會寄送真實Email。

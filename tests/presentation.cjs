@@ -31,7 +31,7 @@ const server = http.createServer((req,res) => {if(require('./static-assets.cjs')
       assert.equal(await page.locator('#todayDate').getAttribute('datetime'),'2027-01-02');
       const dateBox=await page.locator('#todayDate').boundingBox();assert(dateBox.y>=63&&dateBox.y+dateBox.height<700,'today must be visible without scrolling');
       assert.match(await page.locator('#todayDate').innerText(),/2027.*1.*2/);
-      assert.equal(await page.locator('#noteInput').getAttribute('placeholder'),'寫下你的感動、想法或疑問');
+      assert.equal(await page.locator('#noteInput').getAttribute('placeholder'),'寫下你對這段經文的感動、想法或疑問');
       await page.locator('.navbar [data-tab="profile"]').tap();
       await page.getByRole('button',{name:'暗色系',exact:true}).tap();
       assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
