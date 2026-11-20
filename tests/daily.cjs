@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 let available=true, requests=0;
 const fixture=date=>({schemaVersion:1,date,reference:'約翰福音 3:11–4:2',title:'今日經文',verses:[{id:'JHN.3.11',book:'約翰福音',chapter:3,verse:11,reference:'約翰福音 3:11',text:'第一節測試經文。'},{id:'JHN.4.2',book:'約翰福音',chapter:4,verse:2,reference:'約翰福音 4:2',text:'第二節測試經文。'}]});
-const server=http.createServer((req,res)=>{
+const server=http.createServer((req,res)=>{if(require('./static-assets.cjs')(req,res))return;
   if(req.url.startsWith('/data/')){
     requests++;res.setHeader('Content-Type','application/json');
     if(!available){res.statusCode=404;return res.end('{}')}
