@@ -54,3 +54,5 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `node tests/scripture-api.cjs` verifies the fixed-source preview scripture proxy, date validation, malformed upstream and offline behavior. `node tests/daily-preview.cjs` verifies a frozen preview branch still reads today from canonical main data and retains correct-day checkins/annotations on outage. `tests/feed-ten.sql` checks 10-post all-history/reply-first pages and reply Amen isolation/receipts; it runs after the existing group database suite. `node tests/feed-ten-ui.cjs` checks reply Amen/tap treatment, ten-post automatic appends and roster access in Chromium and WebKit.
 
 `feed-five-ui.cjs`：Chromium／WebKit 觸控模式驗證淺／暗色阿們透明、SVG／留言節點與捲動保持、鍵盤焦點、5→10→15 明確按鈕追加、小組設定位置、自己回覆與背景輪詢置頂（含舊讀取與新回覆重疊）。`feed-ten-ui.cjs` 保留為同一測試的相容入口；資料庫的十筆游標仍由 `feed-ten.sql` 驗證。
+
+`pull-refresh.cjs`：取消5000ms輪詢；阿們與回覆的數字間距；頂端下拉72px放開更新；短拉／橫向／多指／取消／收回／最後touchend座標與觸點／放開時已離開頂端；編輯與其他分頁不攔截；更新中合併、失敗保留／重試、已展開數量保留。Chromium以原生CDP觸控補驗，WebKit使用合成Touch Events驗證狀態機。
