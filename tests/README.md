@@ -64,3 +64,5 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `support-seed.py` 驗證未確認Email與非Google身份不能被私有升級指定為管理者；`activity-index.sql` 用EXPLAIN確認最新互動游標可直接走索引。`support-ui.cjs` 另覆蓋多頁讀取中關窗／換管理者帳號停止後續RPC與開窗鍵盤焦點。
 
 `recent-reading.cjs` 驗證今天／昨天／前天原生選單、台北跨月／年、補讀快取與日期別筆記／標註／小組簽到、快速操作與失敗重試、換帳號，以及所有歷史入口的補簽窗口；`recent-reading-edges.cjs` 驗證正式每日與共享快照區分、筆記跳轉取消舊請求、背景fallback隔離、午夜忙碌清理、寫作中延後載入、精確選項文字與帳號載入提示。兩者執行Chromium／WebKit。
+
+`member-streak.cjs` 驗證本機／雲端小組頭像狀態：連續1～3天與4天以上、1000天不封頂、中斷／重複／未來／無效日期、補簽接回、跨日與無障礙文字；維持既有5級發光。Chromium／WebKit皆執行。
