@@ -17,7 +17,7 @@ Google 登入不使用 Supabase 的 Email 驗證碼寄信服務，也不要求�
 - Branding：應用程式名稱 `EyeBible`，支援信箱及開發者聯絡信箱填你的信箱。
 - Audience：一般組員使用個人 Google 帳號，選 External（外部）。測試階段先把你要測試的 Google 信箱加入 Test users。
 - Data Access：只使用 `openid`、`userinfo.email`、`userinfo.profile` 這些基本身分範圍，不需要 Gmail、Drive 或其他 API 權限。
-- 暫不要求額外的自訂品牌／Logo 驗證。正式開放其他組員前，再確認 Audience 發布狀態及 Google 畫面提出的必要要求。
+- 外部正式版請先依[品牌網站連結](google-branding.md)準備公開首頁、隱私權政策與服務條款；品牌與網域驗證及 Audience 發布狀態，依Google後台的實際提示完成。
 
 ## 3. 建立 OAuth 用戶端
 
