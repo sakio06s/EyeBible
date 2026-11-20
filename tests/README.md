@@ -62,3 +62,5 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `support-db.sh` 在隔離Postgres測試升級與管理者／回報者／匿名邊界、去重、已讀、處理／刪除及持久限流；`support-ui.cjs` 透過相同隔離資料庫驗證Chromium管理者與WebKit組員、首頁／導覽／頭像提醒、日期／提供者、分頁與換帳號清除。`activity-ui.cjs` 驗證新直接分享超過多篇舊回覆、送出後定位與重載後歷史保留。
 
 `support-seed.py` 驗證未確認Email與非Google身份不能被私有升級指定為管理者；`activity-index.sql` 用EXPLAIN確認最新互動游標可直接走索引。`support-ui.cjs` 另覆蓋多頁讀取中關窗／換管理者帳號停止後續RPC與開窗鍵盤焦點。
+
+`recent-reading.cjs` 驗證今天／昨天／前天原生選單、台北跨月／年、補讀快取與日期別筆記／標註／小組簽到、快速操作與失敗重試、換帳號，以及所有歷史入口的補簽窗口；`recent-reading-edges.cjs` 驗證正式每日與共享快照區分、筆記跳轉取消舊請求、背景fallback隔離、午夜忙碌清理、寫作中延後載入、精確選項文字與帳號載入提示。兩者執行Chromium／WebKit。
