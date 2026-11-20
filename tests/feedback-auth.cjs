@@ -4,7 +4,7 @@ const {chromium,webkit}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('node:http'),path=require('node:path');
 const root=path.join(__dirname,'..'),fixture=JSON.parse(fs.readFileSync(path.join(root,'data/latest.json')));
 const A='00000000-0000-0000-0000-000000000001',B='00000000-0000-0000-0000-000000000002';
-const key=(...p)=>JSON.stringify(p),rows={};
+let calls=[],holdFeedback=null;const key=(...p)=>JSON.stringify(p),rows={};
 for(const [id,name] of [[A,'恩恩'],[B,'另一帳號']])rows[id]={revision:1,payload:{schemaVersion:1,records:{[key('setting','name')]:name,[key('setting','userId')]:id}}};
 const server=http.createServer((req,res)=>{
  const pathname=new URL(req.url,'http://localhost').pathname;
@@ -30,6 +30,8 @@ const server=http.createServer((req,res)=>{
     const req=route.request(),u=new URL(req.url()),headers={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS'};
     if(req.method()==='OPTIONS')return route.fulfill({headers});
     const actor=JSON.parse(Buffer.from(req.headers().authorization.split('.')[1],'base64').toString()).sub;
+    if(u.pathname.endsWith('/rpc/feedback_read'))return route.fulfill({json:{is_admin:false,unread:0,reports:[],next:null},headers});
+    if(u.pathname.endsWith('/rpc/feedback_action')){const data=req.postDataJSON().p_data;calls.push({actor,data});assert(!Object.hasOwn(data,'to'));if(holdFeedback){const gate=holdFeedback;holdFeedback=null;gate.started();await gate.promise}return route.fulfill({json:{ok:true},headers})}
     if(u.pathname.endsWith('/logout'))return route.fulfill({json:{},headers});
     assert(u.pathname.startsWith('/rest/'),'unexpected authentication request: '+u.pathname);
     if(u.pathname.endsWith('/rpc/group_read')||u.pathname.endsWith('/rpc/group_feed'))return route.fulfill({json:{group:null,members:[],posts:[],unread:0},headers});
@@ -43,9 +45,8 @@ const server=http.createServer((req,res)=>{
    const page=await context.newPage();await page.goto(origin);await page.waitForFunction(()=>document.querySelector('#cloudStatus').textContent==='已同步到雲端');return page;
   }
 
-  const first=await device(chromium,A),other=await device(webkit,B);let calls=[],holdFeedback=null;
-  for(const page of [first,other])await page.context().route('**/api/feedback',async route=>{const req=route.request(),token=req.headers().authorization;assert(token?.startsWith('Bearer '));const actor=JSON.parse(Buffer.from(token.split('.')[1],'base64').toString()).sub,data=req.postDataJSON();calls.push({actor,data});assert(!Object.hasOwn(data,'to'));if(holdFeedback){const gate=holdFeedback;holdFeedback=null;gate.started();await gate.promise}await route.fulfill({json:{ok:true}})});
+  const first=await device(chromium,A),other=await device(webkit,B);
   for(const page of [first,other]){await page.locator('.navbar [data-tab="profile"]').click();await page.locator('#openFeedback').click();await page.locator('#feedbackInput').fill('帳號專屬回報');await page.locator('#sendFeedback').click();await page.waitForFunction(()=>document.querySelector('#feedbackStatus').textContent.includes('已送出'));await page.locator('#closeFeedback').click()}assert.equal(calls[0].actor,A);assert.equal(calls[1].actor,B);
-  let release,started;const begun=new Promise(r=>started=r);holdFeedback={promise:new Promise(r=>release=r),started};await first.locator('#openFeedback').click();await first.locator('#feedbackInput').fill('尚未回應時登出');await first.locator('#sendFeedback').click();await begun;await first.evaluate(()=>document.querySelector('#logoutAccount').click());await first.waitForFunction(()=>!localStorage.getItem('eyebible.cloud.owner'));release();await first.waitForTimeout(200);assert.equal(await first.locator('#feedbackModal').isVisible(),false);assert.equal(await first.locator('#feedbackInput').inputValue(),'');assert(!await first.locator('#feedbackStatus').textContent().then(t=>t.includes('已送出')));console.log('PASS actual account feedback: per-user bearer, private destination, logout clears draft and ignores old response');
+  let release,started;const begun=new Promise(r=>started=r);holdFeedback={promise:new Promise(r=>release=r),started};await first.locator('#openFeedback').click();await first.locator('#feedbackInput').fill('尚未回應時登出');await first.locator('#sendFeedback').click();await begun;await first.evaluate(()=>document.querySelector('#logoutAccount').click());await first.waitForFunction(()=>!localStorage.getItem('eyebible.cloud.owner'));release();await first.waitForTimeout(200);assert.equal(await first.locator('#feedbackModal').isVisible(),false);assert.equal(await first.locator('#feedbackInput').inputValue(),'');assert(!await first.locator('#feedbackStatus').textContent().then(t=>t.includes('已送出')));console.log('PASS actual account feedback: per-user bearer, RPC-only support destination, logout clears draft and ignores old response');
  }finally{await Promise.all(contexts.map(c=>c.close()));await Promise.all(browsers.map(b=>b.close()))}
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>server.close());

@@ -27,7 +27,7 @@ create table if not exists public.eyebible_replies(
 create index if not exists eyebible_replies_post on public.eyebible_replies(post_id,created_at,id);
 alter table public.eyebible_posts add column if not exists last_reply_at timestamptz;
 create table if not exists public.eyebible_reply_reactions(reply_id uuid not null references public.eyebible_replies(id),user_id uuid not null references auth.users(id) on delete cascade,primary key(reply_id,user_id));
-create index if not exists eyebible_posts_activity on public.eyebible_posts(group_id,(last_reply_at is not null) desc,(coalesce(last_reply_at,created_at)) desc,id desc) where deleted_at is null;
+create index if not exists eyebible_posts_latest_activity on public.eyebible_posts(group_id,(greatest(last_reply_at,created_at)) desc,id desc) where deleted_at is null;
 create index if not exists eyebible_active_reply_activity on public.eyebible_replies(post_id,created_at desc,id) where deleted_at is null;
 create or replace function public.eyebible_reply_activity() returns trigger language plpgsql security definer set search_path=pg_catalog,public as $$
 declare target uuid;begin
@@ -184,7 +184,7 @@ end $$;
 -- One bounded, shared payload for both chronological archives and the activity wall.
 create or replace function public.eyebible_post_payload(p_id uuid,p_group uuid,p_actor uuid)
 returns jsonb language sql stable set search_path=pg_catalog,public as $$
- select jsonb_build_object('id',pp.id,'authorId',pp.author_id,'name',coalesce(mm.name,pp.author->>'name','已離開的成員'),'avatar',coalesce(mm.avatar,pp.author->>'avatar','🌿'),'image','','text',pp.text,'reference',pp.reference,'quote',pp.quote,'reading',pp.reading,'verse',pp.verse,'createdAt',pp.created_at,'date',(pp.created_at at time zone 'Asia/Taipei')::date,'lastActivity',coalesce(pp.last_reply_at,pp.created_at),'hasReplies',pp.last_reply_at is not null,
+ select jsonb_build_object('id',pp.id,'authorId',pp.author_id,'name',coalesce(mm.name,pp.author->>'name','已離開的成員'),'avatar',coalesce(mm.avatar,pp.author->>'avatar','🌿'),'image','','text',pp.text,'reference',pp.reference,'quote',pp.quote,'reading',pp.reading,'verse',pp.verse,'createdAt',pp.created_at,'date',(pp.created_at at time zone 'Asia/Taipei')::date,'lastActivity',greatest(pp.last_reply_at,pp.created_at),'hasReplies',pp.last_reply_at is not null,
  'likes',(select count(*) from public.eyebible_reactions where post_id=pp.id),'liked',exists(select 1 from public.eyebible_reactions where post_id=pp.id and user_id=p_actor),
  'replyCount',(select count(*) from public.eyebible_replies where post_id=pp.id and deleted_at is null),
  'replies',coalesce((select jsonb_agg(to_jsonb(r) order by r."createdAt",r.id) from (
@@ -238,7 +238,7 @@ begin
 end $$;
 create or replace function public.group_feed(p_cursor jsonb default null)
 returns jsonb language plpgsql security definer set search_path=pg_catalog,public as $$
-declare actor uuid:=auth.uid();overview jsonb;gid uuid;rows jsonb;extra boolean;cursor_time timestamptz;cursor_id uuid;cursor_replied boolean;next_cursor jsonb;
+declare actor uuid:=auth.uid();overview jsonb;gid uuid;rows jsonb;extra boolean;cursor_time timestamptz;cursor_id uuid;next_cursor jsonb;
 begin
  if actor is null then raise exception 'Authentication required' using errcode='42501';end if;
  overview:=public.group_read('overview');
@@ -246,16 +246,16 @@ begin
  gid:=(overview->'group'->>'id')::uuid;
  if p_cursor is not null and p_cursor<>'null'::jsonb then
   if jsonb_typeof(p_cursor)<>'object' or octet_length(p_cursor::text)>1024 or jsonb_typeof(p_cursor->'replied') is distinct from 'boolean' then raise exception 'Invalid wall cursor' using errcode='22023';end if;
-  begin cursor_time:=(p_cursor->>'time')::timestamptz;cursor_id:=(p_cursor->>'id')::uuid;cursor_replied:=(p_cursor->>'replied')::boolean;exception when others then raise exception 'Invalid wall cursor' using errcode='22023';end;
+  begin cursor_time:=(p_cursor->>'time')::timestamptz;cursor_id:=(p_cursor->>'id')::uuid;exception when others then raise exception 'Invalid wall cursor' using errcode='22023';end;
   if cursor_time is null or cursor_id is null then raise exception 'Invalid wall cursor' using errcode='22023';end if;
  end if;
- select coalesce(jsonb_agg(public.eyebible_post_payload(q.id,gid,actor) order by q.replied desc,q.activity desc,q.id desc),'[]'::jsonb) into rows from (
-  select pp.id,pp.last_reply_at is not null as replied,coalesce(pp.last_reply_at,pp.created_at) as activity from public.eyebible_posts pp where pp.group_id=gid and pp.deleted_at is null
-   and (cursor_time is null or (pp.last_reply_at is not null,coalesce(pp.last_reply_at,pp.created_at),pp.id)<(cursor_replied,cursor_time,cursor_id))
-  order by (pp.last_reply_at is not null) desc,coalesce(pp.last_reply_at,pp.created_at) desc,pp.id desc limit 11
+ select coalesce(jsonb_agg(public.eyebible_post_payload(q.id,gid,actor) order by q.activity desc,q.id desc),'[]'::jsonb) into rows from (
+  select pp.id,greatest(pp.last_reply_at,pp.created_at) as activity from public.eyebible_posts pp where pp.group_id=gid and pp.deleted_at is null
+   and (cursor_time is null or (greatest(pp.last_reply_at,pp.created_at),pp.id)<(cursor_time,cursor_id))
+  order by greatest(pp.last_reply_at,pp.created_at) desc,pp.id desc limit 11
  )q;
  extra:=jsonb_array_length(rows)>10;if extra then rows:=rows-10;next_cursor:=jsonb_build_object('time',rows->9->>'lastActivity','id',rows->9->>'id','replied',rows->9->'hasReplies');end if;
- return overview||jsonb_build_object('posts',rows,'next',next_cursor);
+ return overview||jsonb_build_object('posts',rows,'next',next_cursor,'sortVersion',2);
 end $$;
 revoke all on function public.group_feed(jsonb) from public,anon;
 grant execute on function public.group_feed(jsonb) to authenticated;

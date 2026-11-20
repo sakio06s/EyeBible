@@ -51,10 +51,14 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 
 `node tests/groups-edge.cjs` covers all independent review fixes: semantic scripture identity and conflicting-version isolation, group/session-bound drafts with private-draft preservation, per-operation multi-tab outboxes, delayed old-group pagination, refreshed expanded feeds, retained archive pages/replies, Taipei reply dates, photo DOM reuse and ungrouped personal checkins. `groups-db.sh` includes `groups-payload.sql` for bounded photo/unseen payloads and `groups-races.sh` for concurrent joins. SQL set-operation receipt tests prove an acknowledged-but-lost operation cannot undo a newer opposite choice.
 
-`node tests/scripture-api.cjs` verifies the fixed-source preview scripture proxy, date validation, malformed upstream and offline behavior. `node tests/daily-preview.cjs` verifies a frozen preview branch still reads today from canonical main data and retains correct-day checkins/annotations on outage. `tests/feed-ten.sql` checks 10-post all-history/reply-first pages and reply Amen isolation/receipts; it runs after the existing group database suite. `node tests/feed-ten-ui.cjs` checks reply Amen/tap treatment, ten-post automatic appends and roster access in Chromium and WebKit.
+`node tests/scripture-api.cjs` verifies the fixed-source preview scripture proxy, date validation, malformed upstream and offline behavior. `node tests/daily-preview.cjs` verifies a frozen preview branch still reads today from canonical main data and retains correct-day checkins/annotations on outage. `tests/feed-ten.sql` checks 10-post all-history/latest-activity pages and reply Amen isolation/receipts; it runs after the existing group database suite. `node tests/feed-ten-ui.cjs` checks reply Amen/tap treatment, ten-post automatic appends and roster access in Chromium and WebKit.
 
 `feed-five-ui.cjs`：Chromium／WebKit 觸控模式驗證淺／暗色阿們透明、SVG／留言節點與捲動保持、鍵盤焦點、5→10→15 明確按鈕追加、小組設定位置、自己回覆與背景輪詢置頂（含舊讀取與新回覆重疊）。`feed-ten-ui.cjs` 保留為同一測試的相容入口；資料庫的十筆游標仍由 `feed-ten.sql` 驗證。
 
 `pull-refresh.cjs`：取消5000ms輪詢；阿們與回覆的數字間距；頂端下拉72px放開更新；短拉／橫向／多指／取消／收回／最後touchend座標與觸點／放開時已離開頂端；編輯與其他分頁不攔截；更新中合併、失敗保留／重試、已展開數量保留。Chromium以原生CDP觸控補驗，WebKit使用合成Touch Events驗證狀態機。
 
-`composers-feedback.cjs` 驗證固定發文列、獨立純文字分享、無經文與重載隔離、等距按鈕、私人讀經筆記、小組標題、回報表單與固定重試內容。`feedback-api.cjs` 用假的Auth／寄信回應驗證伺服器權限、隱藏固定收件者、純文字／長度／識別碼、去重、限流與失敗。`feedback-auth.cjs` 使用實際帳號模組及SDK fixtures，驗證各帳號Bearer與登出後的回報草稿／回應隔離。這些測試不會寄送真實Email。
+`composers-feedback.cjs` 驗證固定發文列、獨立純文字分享、無經文與重載隔離、等距按鈕、私人讀經筆記、小組標題、回報表單與固定重試內容。`feedback-auth.cjs` 使用實際帳號模組及SDK fixtures，驗證各帳號Bearer與登出後的回報草稿／回應隔離。本版本不使用Email。
+
+`support-db.sh` 在隔離Postgres測試升級與管理者／回報者／匿名邊界、去重、已讀、處理／刪除及持久限流；`support-ui.cjs` 透過相同隔離資料庫驗證Chromium管理者與WebKit組員、首頁／導覽／頭像提醒、日期／提供者、分頁與換帳號清除。`activity-ui.cjs` 驗證新直接分享超過多篇舊回覆、送出後定位與重載後歷史保留。
+
+`support-seed.py` 驗證未確認Email與非Google身份不能被私有升級指定為管理者；`activity-index.sql` 用EXPLAIN確認最新互動游標可直接走索引。`support-ui.cjs` 另覆蓋多頁讀取中關窗／換管理者帳號停止後續RPC與開窗鍵盤焦點。

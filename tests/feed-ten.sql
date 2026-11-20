@@ -11,6 +11,10 @@ do $$ declare g text:=public.group_read()->'group'->>'id';r jsonb;cursor jsonb;c
  perform public.group_action('amen',jsonb_build_object('group_id',g,'post_id','44444444-4444-4444-8444-444444444444','reply_id','aaaaaaaa-1111-4111-8111-111111111111','active',false,'operation_id','aaaaaaaa-2222-4222-8222-222222222222'));
  perform public.group_action('amen',jsonb_build_object('group_id',g,'post_id','44444444-4444-4444-8444-444444444444','reply_id','aaaaaaaa-1111-4111-8111-111111111111','active',true,'operation_id','aaaaaaaa-2222-4222-8222-222222222221'));
  r:=public.group_feed();if (r->'posts'->0->'replies'->0->>'likes')::int<>0 then raise exception 'Old reply Amen retry reversed later choice';end if;
+ perform public.group_action('post',jsonb_build_object('group_id',g,'id','99999999-1111-4111-8111-111111111111','text','fresh direct share'));
+ r:=public.group_feed();if r->'posts'->0->>'id'<>'99999999-1111-4111-8111-111111111111' then raise exception 'Fresh direct post must precede older replied thread';end if;
+ perform public.group_action('reply',jsonb_build_object('group_id',g,'post_id','44444444-4444-4444-8444-444444444444','id','aaaaaaaa-1111-4111-8111-111111111112','text','newer reply moves old thread above fresh post'));
+ r:=public.group_feed();if r->'posts'->0->>'id'<>'44444444-4444-4444-8444-444444444444' then raise exception 'New reply must promote by activity time';end if;
  loop
   for p in select jsonb_array_elements(r->'posts') loop
    if (p->>'id')=any(ids) then raise exception 'Duplicate feed page item';end if;
