@@ -11,7 +11,7 @@ const server=http.createServer((req,res)=>{
  if(pathname==='/cloud/config.js'){res.setHeader('Content-Type','text/javascript');return res.end('window.EYEBIBLE_CLOUD='+JSON.stringify({url:'https://devices-test.supabase.co',publishableKey:'sb_publishable_test',authMode:'google',groupsEnabled:true})+';')}
  if(pathname.startsWith('/data/')){res.setHeader('Content-Type','application/json');return res.end(JSON.stringify(fixture))}
  const file=pathname==='/'?'/index.html':pathname;
- if(!/^\/(index.html|assets\/(?:eyebible|daymarkbible-brand-source).png|cloud\/[a-z0-9./-]+)$/.test(file)){res.statusCode=404;return res.end()}
+ if(!/^\/(index.html|assets\/(?:eyebible|tagbible-brand-source).png|cloud\/[a-z0-9./-]+)$/.test(file)){res.statusCode=404;return res.end()}
  res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.png')?'image/png':'text/html;charset=utf-8');res.end(fs.readFileSync(path.join(root,file)));
 });
 (async()=>{

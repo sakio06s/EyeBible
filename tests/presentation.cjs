@@ -26,7 +26,7 @@ const server = http.createServer((req,res) => {if(require('./static-assets.cjs')
       const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
       await page.goto('http://127.0.0.1:'+server.address().port);
       await page.waitForFunction(()=>document.querySelector('#readingStatus').textContent.startsWith('今日經文 · 2027-01-02'));
-      assert(await page.getByRole('img',{name:'daymarkbible',exact:true}).isVisible());
+      assert(await page.getByRole('img',{name:'TagBible',exact:true}).isVisible());
       assert.equal(await page.locator('.subbrand').count(),0);
       assert.equal(await page.locator('#todayDate').getAttribute('datetime'),'2027-01-02');
       const dateBox=await page.locator('#todayDate').boundingBox();assert(dateBox.y>=63&&dateBox.y+dateBox.height<700,'today must be visible without scrolling');
