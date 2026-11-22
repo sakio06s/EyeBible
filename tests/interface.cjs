@@ -13,7 +13,7 @@ assert.equal(await page.locator('#firstAvatars .avataropt').count(),18);
 await page.locator('#firstName').fill('恩恩');await page.locator('#firstAvatars [data-avatar="🌸"]').tap();await page.locator('#createProfile').tap();
 await page.waitForFunction(()=>!document.querySelector('#readingStatus').textContent.includes('正在取得'));
 assert.equal(await page.locator('#shareBtn').count(),0);
-assert(await page.getByRole('img',{name:'EyeBible',exact:true}).isVisible());
+assert(await page.getByRole('img',{name:'daymarkbible',exact:true}).isVisible());
 assert.equal(await page.locator('#reading > .eyebrow, #readingTitle, .daily-status-card').count(),0);
 const ref=await page.locator('#readingReference').boundingBox(),retry=await page.locator('#retryReading').boundingBox();assert(retry.x>=ref.x+ref.width&&Math.abs(ref.y-retry.y)<20,'small retry button belongs beside scripture title');
 assert.equal(await page.locator('.navbar [data-tab="group"]').innerText(),'♡\n小組互動');
