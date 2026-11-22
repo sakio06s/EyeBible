@@ -1,20 +1,24 @@
-# EyeBible Google 登入與個人雲端儲存
+# TagBible Google 登入與個人雲端儲存
 
 目前採用 Google 登入。測試分支已連接 Supabase 公開設定；正式網站待真實 Google 登入與跨裝置同步驗證後才啟用。本階段僅同步個人資料，不共享其他組員或私人筆記。
 
 Google 登入不使用 Supabase 的 Email 驗證碼寄信服務，也不要求購買自有網域。Supabase、Vercel 的免費額度仍各自適用。
 
+## 既有專案更名
+
+現有專案請依[更名切換清單](tagbible-launch-rename.md)修改顯示名稱，不要重建專案、金鑰或資料庫。下方舊網址是目前沿用的登入設定；新網址確認可用後才增補／切換，暫時保留舊網址供過渡。
+
 ## 1. 建立 Google Cloud 專案
 
 1. 開啟 https://console.cloud.google.com/ ，使用你的 Google 帳號登入。
-2. 在上方專案選單選擇新增專案，命名為 `EyeBible`。
+2. 在上方專案選單選擇新增專案，命名為 `TagBible`。
 3. 本次只設定 Google Auth Platform 的 OAuth 登入，不需要啟用付費 API、建立計費帳戶或申請付費試用。
 
 ## 2. 設定 Google Auth Platform
 
-在選好的 EyeBible 專案中，開啟 Google Auth Platform；第一次使用時按 Get started（開始設定）。若看到舊版選單，對應位置是 APIs & Services 的 OAuth consent screen 與 Credentials。
+在選好的 TagBible 專案中，開啟 Google Auth Platform；第一次使用時按 Get started（開始設定）。若看到舊版選單，對應位置是 APIs & Services 的 OAuth consent screen 與 Credentials。
 
-- Branding：應用程式名稱 `EyeBible`，支援信箱及開發者聯絡信箱填你的信箱。
+- Branding：應用程式名稱 `TagBible`，支援信箱及開發者聯絡信箱填你的信箱。
 - Audience：一般組員使用個人 Google 帳號，選 External（外部）。測試階段先把你要測試的 Google 信箱加入 Test users。
 - Data Access：只使用 `openid`、`userinfo.email`、`userinfo.profile` 這些基本身分範圍，不需要 Gmail、Drive 或其他 API 權限。
 - 外部正式版請先依[品牌網站連結](google-branding.md)準備公開首頁、隱私權政策與服務條款；品牌與網域驗證及 Audience 發布狀態，依Google後台的實際提示完成。
@@ -24,7 +28,7 @@ Google 登入不使用 Supabase 的 Email 驗證碼寄信服務，也不要求�
 在 Google Auth Platform → Clients（或 Credentials → Create credentials → OAuth client ID）：
 
 - Application type：Web application。
-- 名稱：`EyeBible Web`。
+- 名稱：`TagBible Web`。
 - Authorized JavaScript origins：
 
 ```text
@@ -42,7 +46,7 @@ https://mddbzoagloktnwoszuvj.supabase.co/auth/v1/callback
 
 ## 4. 在 Supabase 啟用 Google
 
-進入 EyeBible 專案 → Authentication → Sign In / Providers → Google：
+進入 TagBible 專案 → Authentication → Sign In / Providers → Google：
 
 1. 開啟 Google 登入。
 2. 把 Google 的 Client ID 與 Client Secret 貼到對應欄位，儲存。
@@ -79,7 +83,7 @@ https://eyebible-git-codex-account-cloud-shane-lin.vercel.app/
 6. 第二個瀏覽器登入同一個 Google 帳號，確認同步；修改一筆，再回原瀏覽器按立即同步。
 7. 登出應回到原本的訪客資料，其他帳號不能看到帳號專有筆記。
 
-Google 登入不會寄送 EyeBible Email 驗證碼；Google 本身的帳號安全檢查仍依它的流程進行。發布給一般組員前需確認 Google Audience 設定及實際授權結果。
+Google 登入不會寄送 TagBible Email 驗證碼；Google 本身的帳號安全檢查仍依它的流程進行。發布給一般組員前需確認 Google Audience 設定及實際授權結果。
 
 ## Email 驗證碼（目前不啟用）
 

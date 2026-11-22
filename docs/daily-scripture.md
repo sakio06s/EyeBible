@@ -1,6 +1,6 @@
 # Daily scripture operation
 
-EyeBible follows the **daily scripture range** on Taiwan Duranno's Living Life page:
+TagBible follows the **daily scripture range** on Taiwan Duranno's Living Life page:
 https://www.duranno.tw/livinglife/index.php/daily
 
 The updater reads only the source date and scripture range. It does not publish the source's devotional article, prayer, images or audio. Scripture text is the public-domain traditional Chinese Union Version from `seven1m/open-bibles`, pinned to commit `df3d5958933e0e1a62495fe95527b5949bb04a9f` (`chi-cuv.usfx.xml`). Attribution and provenance are included in every generated JSON record.

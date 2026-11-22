@@ -4,7 +4,7 @@
 
 ## 現有專案啟用一次
 
-1. 管理者須先用指定的Google帳號登入EyeBible一次，且Google身份的Email已驗證。
+1. 管理者須先用指定的Google帳號登入TagBible一次，且Google身份的Email已驗證。
 2. 在Supabase SQL Editor執行準備好的私有升級檔；或複製`cloud/upgrade-support.sql`，把最後的`__ADMIN_LOGIN_EMAIL__`改成管理者登入信箱後執行。
 3. 重新整理測試版v0.15.1。管理者「我的設定 → 問題回報」會顯示問題列表；其他使用者保留填寫表單。
 
