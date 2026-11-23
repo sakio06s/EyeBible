@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-22",
+  "reference": "哥林多後書1:15-24",
+  "title": "今日經文",
+  "verses": [
+    {
+      "id": "2CO.1.15",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 15,
+      "reference": "哥林多後書 1:15",
+      "text": "我既然這樣深信，就早有意到你們那裏去，叫你們再得益處；"
+    },
+    {
+      "id": "2CO.1.16",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 16,
+      "reference": "哥林多後書 1:16",
+      "text": "也要從你們那裏經過，往馬其頓去，再從馬其頓回到你們那裏，叫你們給我送行往猶太去。"
+    },
+    {
+      "id": "2CO.1.17",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 17,
+      "reference": "哥林多後書 1:17",
+      "text": "我有此意，豈是反復不定嗎？我所起的意，豈是從情慾起的，叫我忽是忽非嗎？"
+    },
+    {
+      "id": "2CO.1.18",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 18,
+      "reference": "哥林多後書 1:18",
+      "text": "我指着信實的神說，我們向你們所傳的道，並沒有是而又非的。"
+    },
+    {
+      "id": "2CO.1.19",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 19,
+      "reference": "哥林多後書 1:19",
+      "text": "因為我和西拉並提摩太，在你們中間所傳神的兒子耶穌基督，總沒有是而又非的，在他只有一是。"
+    },
+    {
+      "id": "2CO.1.20",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 20,
+      "reference": "哥林多後書 1:20",
+      "text": "神的應許，不論有多少，在基督都是是的。所以藉着他也都是實在〔實在：原文作阿們〕的，叫神因我們得榮耀。"
+    },
+    {
+      "id": "2CO.1.21",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 21,
+      "reference": "哥林多後書 1:21",
+      "text": "那在基督裏堅固我們和你們，並且膏我們的就是神。"
+    },
+    {
+      "id": "2CO.1.22",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 22,
+      "reference": "哥林多後書 1:22",
+      "text": "他又用印印了我們，並賜聖靈在我們心裏作憑據〔原文作質〕。"
+    },
+    {
+      "id": "2CO.1.23",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 23,
+      "reference": "哥林多後書 1:23",
+      "text": "我呼籲神給我的心作見證，我沒有往哥林多去是為要寬容你們。"
+    },
+    {
+      "id": "2CO.1.24",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 24,
+      "reference": "哥林多後書 1:24",
+      "text": "我們並不是轄管你們的信心，乃是幫助你們的快樂，因為你們憑信纔站立得住。"
+    }
+  ],
+  "planSource": "https://www.youtube.com/watch?v=u1FyBPaWcqQ",
+  "translation": "和合本（繁體、公版）",
+  "textSource": "https://raw.githubusercontent.com/seven1m/open-bibles/df3d5958933e0e1a62495fe95527b5949bb04a9f/chi-cuv.usfx.xml",
+  "licenseSource": "https://github.com/seven1m/open-bibles/blob/master/README.md"
+}
