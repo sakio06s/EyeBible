@@ -1,6 +1,6 @@
 'use strict';
 // Preview branches read the scheduler's canonical main data, never arbitrary URLs.
-const ROOT='https://raw.githubusercontent.com/sakio06s/EyeBible/main/data/';
+const ROOT='https://raw.githubusercontent.com/sakio06s/TagBible/main/data/';
 const LIMIT=1024*1024;
 function validDate(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value+'T00:00:00Z'))&&new Date(value+'T00:00:00Z').toISOString().slice(0,10)===value}
 function validPayload(value,expected){if(!value||value.schemaVersion!==1||!validDate(value.date)||(expected&&value.date!==expected)||typeof value.title!=='string'||typeof value.reference!=='string'||!value.reference.trim()||!Array.isArray(value.verses)||!value.verses.length||value.verses.length>500)return false;const ids=new Set();return value.verses.every(v=>{if(!v||typeof v.id!=='string'||!v.id||ids.has(v.id)||typeof v.book!=='string'||typeof v.reference!=='string'||!Number.isInteger(v.chapter)||v.chapter<1||!Number.isInteger(v.verse)||v.verse<1||typeof v.text!=='string'||!v.text.trim()||v.text.length>10000)return false;ids.add(v.id);return true})}

@@ -2,12 +2,14 @@
 
 ## 目前狀態
 
-App HTML／字標／介紹／隱私／條款已改成 TagBible。目標儲存庫為 sakio06s/tagbible，目標正式網址為 https://tagbible.vercel.app/；兩者尚未完成變更，不能當作可用網址。Vercel 後台仍停在登入頁，安全登入逾時；GitHub integration 的 repository rename API 回傳 403 Resource not accessible by integration。沒有修改正式部署、刪除資料或更換憑證。
+App HTML／字標／介紹／隱私／條款已改成 TagBible。2026-11-23 已確認 GitHub 更名為 [sakio06s/TagBible](https://github.com/sakio06s/TagBible)，repository ID 1460893685 不變，分支與 PR 保留；本機 remote 與每日經文 API canonical repository URL 同步更新。
+
+目標正式網址為 https://tagbible.vercel.app/，Vercel 網域尚未確認或切換，不能當作已可用網址。此處雲端瀏覽器仍顯示 Vercel 登入頁。先前 integration rename API 403 已由擁有者在 GitHub 操作完成；沒有修改正式部署、刪除資料或更換憑證。
 
 ## 切換順序
 
 1. Vercel 現有專案 Settings → General：Project Name 改 tagbible。Domains 明確新增／確認 tagbible.vercel.app 是否可用；專案名稱變更不代表網域已變更。若已被使用先回報，不另選名稱、不購買網域。保留原網址到新站與登入驗證完成。
-2. GitHub 現有儲存庫 Settings → General → Repository name 改 tagbible；沿用同一儲存庫，保留歷史、分支、PR、Actions。確認舊網址轉向與 Vercel Git integration 仍指向同一 repository ID。隨後同步 remote、每日經文 API 的 canonical repository URL 及設定文件。
+2. GitHub 已完成更名 TagBible，同一 repository ID、歷史、分支、PR、Actions 保留。後續需在 Vercel 確認 Git integration 指向此儲存庫。
 3. Google Cloud 原專案顯示名稱改 TagBible；Project ID 通常不能改，不重建 OAuth 憑證。Google Auth Platform → Branding 名稱 TagBible；Clients 的顯示名稱 TagBible Web。保留同一 Client ID／Secret、基本 scopes 與發布設定。JavaScript origins 加上實際取得的新正式／預覽 origin。
 4. Supabase 原專案顯示名稱改 TagBible。Authentication → URL Configuration：取得新網址後 Site URL 改新正式網址，Redirect URLs 增補新正式／實際預覽網址（精確值，不加全域萬用字元），過渡期保留舊站。Google provider 設定與 callback 維持 https://mddbzoagloktnwoszuvj.supabase.co/auth/v1/callback 。Project reference／API URL 不是品牌名稱，不可直接替換成 tagbible。
 5. 準備新版正式部署並保留可回復版本，核對 main 每日經文最新資料，不能用較舊預覽 JSON 蓋掉排程資料。正式部署與公開政策發布另須確認切換狀態；目前沒有合併完整候選 App。
