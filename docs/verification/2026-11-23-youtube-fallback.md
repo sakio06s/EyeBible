@@ -1,0 +1,9 @@
+# Daily progress YouTube fallback verification
+
+User authorized fixed channel UCqUnxXxHSFb6At-njlSX9AQ as backup only. Official Duranno page currently announces maintenance and has no daily range. Workspace YouTube fetch fails at proxy; verification was performed by the actual GitHub Actions execution environment, not inferred from fixtures.
+
+Actions verify-only run 45127874250 succeeded on c8500168733171339a66cdc5b2a9fcfe11e02483: validate succeeded; verify-sources succeeded; publish skipped. Updater resolved 2026-11-23 from https://www.youtube.com/watch?v=6zZrnFHIh1w and selected pinned public-domain Bible verses into RUNNER_TEMP only. Live feed channel title CGN Chinese_活潑的生命. Observed dated title identifies 哥林多後書2:1-11. Feed root uses ID without UC; entries use complete UC ID. Only those two exact root forms allowed; each entry still requires the exact complete ID. Other IDs remain rejected.
+
+27 Python tests pass including observed title format, primary priority, date mismatch/conflict, malformed/wrong channel/video, no matching date, conflicting references, multiple matching videos, network/Bible failure preservation, CLI provenance and source-recovery immutability. Independent scoped review identified valid-prefix extraction and title/description date disagreement; both fixed with regression tests. Unsupported ranges (至3, -9999, /3) are rejected whole, rather than shortened. No unresolved important review findings.
+
+Chromium/WebKit: daily, recent-reading, public-info and progress-source passed. Source URL allowlist rejects JavaScript, other hosts and injected attributes. No data files, SQL, credentials or existing user records changed by the feature commit. Production daily publication and deployment must be confirmed after merge; dryrun success does not itself mean main data has updated.

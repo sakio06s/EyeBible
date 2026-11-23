@@ -10,10 +10,13 @@ from pathlib import Path
 import re
 import tempfile
 import urllib.request
+import unicodedata
 import xml.etree.ElementTree as ET
 from zoneinfo import ZoneInfo
 
 SOURCE_URL = 'https://www.duranno.tw/livinglife/index.php/daily'
+YOUTUBE_CHANNEL = 'UCqUnxXxHSFb6At-njlSX9AQ'
+YOUTUBE_FEED = 'https://www.youtube.com/feeds/videos.xml?channel_id='+YOUTUBE_CHANNEL
 BIBLE_COMMIT = 'df3d5958933e0e1a62495fe95527b5949bb04a9f'
 BIBLE_URL = f'https://raw.githubusercontent.com/seven1m/open-bibles/{BIBLE_COMMIT}/chi-cuv.usfx.xml'
 BIBLE_LICENSE = 'https://github.com/seven1m/open-bibles/blob/master/README.md'
@@ -45,7 +48,72 @@ class RangeParser(HTMLParser):
             self.parts.append(data)
 
 def normalize_reference(reference):
-    return re.sub(r'\s+', '', unescape(reference)).translate(str.maketrans('：～∼–—－；，、', ':-----;,,')).strip()
+    return re.sub(r'\s+', '', unicodedata.normalize('NFKC',unescape(reference))).translate(str.maketrans('：～∼–—－；，、', ':-----;,,')).replace('~','-').strip()
+
+def reading_dates(text):
+    text = unicodedata.normalize('NFKC',text)
+    parts = re.findall(r'(?<!\d)(20\d{2})\s*[-/.年]\s*(\d{1,2})\s*[-/.月]\s*(\d{1,2})\s*日?(?!\d)',text)
+    parts += re.findall(r'(?<!\d)(20\d{2})(\d{2})(\d{2})(?!\d)',text)
+    return {date(int(y),int(m),int(d)) for y,m,d in parts}
+
+def references_in(text):
+    text = unicodedata.normalize('NFKC',unescape(text))
+    books = '|'.join(re.escape(name) for name in sorted(BOOKS,key=len,reverse=True))
+    # Capture the entire numeric continuation first; never accept a valid prefix
+    # of an unsupported range (e.g. 8:1至3 or 8:1-9999).
+    pattern = r'(?:'+books+r')\s*\d+\s*:\s*\d+(?:\s*[-~∼–—－至到,、;:/\\.]\s*\d+)*'
+    verse = r'\d{1,3}(?:-(?:\d{1,3}:)?\d{1,3})?'
+    supported = r'(?:'+books+r')\d{1,3}:'+verse+r'(?:[,;](?:\d{1,3}:)?'+verse+r')*'
+    refs = set()
+    for match in re.finditer(pattern,text):
+        ref = normalize_reference(match[0])
+        if not re.fullmatch(supported,ref):
+            raise ValueError('Unsupported complete scripture reference')
+        refs.add(ref)
+    return refs
+
+def parse_youtube_feed(text, expected_date):
+    # The uploader's explicit reading date is authoritative, never upload order/date.
+    ns = {'a':'http://www.w3.org/2005/Atom','yt':'http://www.youtube.com/xml/schemas/2015','media':'http://search.yahoo.com/mrss/'}
+    try:
+        root = ET.fromstring(text)
+    except ET.ParseError as error:
+        raise ValueError('Invalid YouTube feed') from error
+    if root.tag != '{'+ns['a']+'}feed' or root.findtext('yt:channelId',namespaces=ns) not in {YOUTUBE_CHANNEL,YOUTUBE_CHANNEL[2:]}:
+        raise ValueError('Unexpected YouTube channel')
+    candidates = []
+    for entry in root.findall('a:entry',ns):
+        if entry.findtext('yt:channelId',namespaces=ns) != YOUTUBE_CHANNEL:
+            continue
+        video = entry.findtext('yt:videoId',default='',namespaces=ns)
+        if not re.fullmatch(r'[A-Za-z0-9_-]{11}',video):
+            continue
+        title = entry.findtext('a:title',default='',namespaces=ns)
+        description = entry.findtext('media:group/media:description',default='',namespaces=ns)
+        try:
+            labelled_dates = re.findall(r'(?m)^\s*(?:日期|讀經日期|靈修日期)\s*[:：]\s*(.+)$',description)
+            dates = reading_dates(title) | reading_dates(' '.join(labelled_dates))
+        except ValueError:
+            continue
+        if dates != {expected_date}:
+            continue
+        title_refs = references_in(title)
+        lines = re.findall(r'(?m)^\s*(?:今日經文|讀經經文|讀經範圍|經文|經文進度|讀經進度)\s*[:：]\s*(.+)$',description)
+        refs = title_refs | references_in(' '.join(lines))
+        if not refs:
+            continue
+        if len(refs) != 1:
+            raise ValueError('Ambiguous YouTube reading reference')
+        candidates.append((next(iter(refs)),'https://www.youtube.com/watch?v='+video))
+    if not candidates or len({ref for ref,_ in candidates}) != 1:
+        raise ValueError('No unambiguous YouTube reading for '+expected_date.isoformat())
+    return candidates[0]
+
+def resolve_daily_reference(primary_loader, backup_loader, expected_date):
+    try:
+        return parse_daily_page(primary_loader(),expected_date),SOURCE_URL
+    except (OSError,ValueError):
+        return parse_youtube_feed(backup_loader(),expected_date)
 
 def parse_daily_page(html, expected_date):
     dates = {date(int(y),int(m),int(d)) for y,m,d in re.findall(r'(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日',unescape(html))}
@@ -146,14 +214,20 @@ def atomic_write(path, text):
 
 def publish(html, xml, output, expected_date):
     reference = parse_daily_page(html,expected_date)
+    return publish_reference(reference,xml,output,expected_date,SOURCE_URL)
+
+def publish_reference(reference, xml, output, expected_date, plan_source):
     verses = select_verses(reference,parse_usfx(xml))
-    payload = {'schemaVersion':1,'date':expected_date.isoformat(),'reference':reference,'title':'今日經文','verses':verses,'planSource':SOURCE_URL,'translation':'和合本（繁體、公版）','textSource':BIBLE_URL,'licenseSource':BIBLE_LICENSE}
+    payload = {'schemaVersion':1,'date':expected_date.isoformat(),'reference':reference,'title':'今日經文','verses':verses,'planSource':plan_source,'translation':'和合本（繁體、公版）','textSource':BIBLE_URL,'licenseSource':BIBLE_LICENSE}
     output = Path(output)
     daily = output/'daily'/f'{expected_date.isoformat()}.json'
     latest = output/'latest.json'
     # Published days are immutable: don't silently move existing annotations to changed text.
-    if daily.exists() and json.loads(daily.read_text(encoding='utf-8')) != payload:
-        raise ValueError('Published reading changed; manual review required')
+    if daily.exists():
+        saved = json.loads(daily.read_text(encoding='utf-8'))
+        if {k:v for k,v in saved.items() if k!='planSource'} != {k:v for k,v in payload.items() if k!='planSource'}:
+            raise ValueError('Published reading changed; manual review required')
+        payload = saved  # Source recovery must not rewrite an immutable day's provenance.
     if latest.exists():
         old = json.loads(latest.read_text(encoding='utf-8'))
         if old.get('date','') > payload['date']:
@@ -179,14 +253,16 @@ def main():
     parser.add_argument('--date',type=date.fromisoformat,default=datetime.now(ZoneInfo('Asia/Taipei')).date())
     parser.add_argument('--output',type=Path,default=Path(__file__).resolve().parents[1]/'data')
     parser.add_argument('--source-file',type=Path)
+    parser.add_argument('--youtube-feed-file',type=Path)
     parser.add_argument('--bible-file',type=Path)
     args = parser.parse_args()
-    page = args.source_file.read_text(encoding='utf-8') if args.source_file else download(SOURCE_URL)
-    # Check the source date before downloading the larger Bible text.
-    parse_daily_page(page,args.date)
+    primary = lambda: args.source_file.read_text(encoding='utf-8') if args.source_file else download(SOURCE_URL)
+    backup = lambda: args.youtube_feed_file.read_text(encoding='utf-8') if args.youtube_feed_file else download(YOUTUBE_FEED)
+    reference,plan_source = resolve_daily_reference(primary,backup,args.date)
     xml = args.bible_file.read_text(encoding='utf-8') if args.bible_file else download(BIBLE_URL)
-    changed = publish(page,xml,args.output,args.date)
+    changed = publish_reference(reference,xml,args.output,args.date,plan_source)
     print(('Published' if changed else 'Already current')+' scripture for '+str(args.date))
+    print('Progress source: '+plan_source)
 
 if __name__ == '__main__':
     main()

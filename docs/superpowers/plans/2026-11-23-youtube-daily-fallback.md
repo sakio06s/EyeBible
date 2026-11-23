@@ -1,0 +1,7 @@
+# YouTube daily progress fallback
+
+Owner supplied channel UCqUnxXxHSFb6At-njlSX9AQ as backup only when official daily progress is unavailable. Keep the official source first. Read the fixed channel's public Atom feed, require matching channel identity and explicit reading date, extract an unambiguous scripture reference from title/labelled description. Publication timestamp alone never establishes the reading date. Fetch only the pinned public-domain Bible text for verses; no video/audio/article copying. No new API key or paid service.
+
+Fail closed on missing/invalid/wrong date/channel, ambiguous references, conflicting matching videos, unsupported range, absent Bible verse or network failure; retain old files. A primary-source recovery cannot silently change existing same-day verses or provenance. Preserve immutable daily record when content agrees and only source metadata differs. Record selected progress URL in JSON and display correct link in the reading footer.
+
+Implementation: parser + injectable source resolver; existing publish wrapper preserved; CLI supports a local feed fixture; fixture tests cover primary priority, source/date/format/ambiguity, immutable source switches, failure preservation. Verify actual channel/video metadata before claiming live fallback works. Current environment cannot fetch YouTube public list; user asked for a sample video. Live CI result remains a required verification before reporting operation complete.
