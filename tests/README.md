@@ -68,3 +68,5 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `member-streak.cjs` 驗證本機／雲端小組頭像狀態：連續1～3天與4天以上、1000天不封頂、中斷／重複／未來／無效日期、補簽接回、跨日與無障礙文字；維持既有5級發光。Chromium／WebKit皆執行。
 
 `public-info.cjs` 驗證公開介紹／隱私／條款在無JavaScript、亮暗色320px畫面可讀，沒有SDK／Auth依賴、首頁政策互鏈、歡迎／設定入口、個資說明與刪除後伺服器保留原文的揭露。Chromium／WebKit執行。
+
+`python3 -m unittest discover -s tests -p "test_*.py"` 包含官網優先／指定 YouTube 頻道備援、日期／參考範圍／頻道驗證、來源恢復後不可變紀錄、CLI 錯誤不覆寫。`node tests/progress-source.cjs` 驗證來源連結與不可信 URL 拒絕。

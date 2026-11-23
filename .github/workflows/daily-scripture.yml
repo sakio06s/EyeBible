@@ -6,6 +6,11 @@ on:
     - cron: '5,35 16 * * *'
     - cron: '5 20 * * *'
   workflow_dispatch:
+    inputs:
+      verify_only:
+        description: 'Verify current sources without publishing data'
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -15,7 +20,7 @@ on:
     paths:
       - '.github/workflows/daily-scripture.yml'
       - 'scripts/update_daily.py'
-      - 'tests/test_update_daily.py'
+      - 'tests/test_*.py'
 
 permissions:
   contents: read
@@ -29,8 +34,18 @@ jobs:
       - name: Test importer validation and failure handling
         run: python3 -m unittest discover -s tests -p 'test_*.py'
 
+  verify-sources:
+    if: github.event_name == 'workflow_dispatch' && inputs.verify_only
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Resolve today's progress and verses without publishing
+        run: python3 scripts/update_daily.py --output "$RUNNER_TEMP/tagbible-source-check"
+
   publish:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && !inputs.verify_only
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 5
