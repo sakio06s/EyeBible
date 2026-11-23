@@ -4,7 +4,9 @@
 
 App HTML／字標／介紹／隱私／條款已改成 TagBible。2026-11-23 已確認 GitHub 更名為 [sakio06s/TagBible](https://github.com/sakio06s/TagBible)，repository ID 1460893685 不變，分支與 PR 保留；本機 remote 與每日經文 API canonical repository URL 同步更新。
 
-目標正式網址為 https://tagbible.vercel.app/，Vercel 網域尚未確認或切換，不能當作已可用網址。此處雲端瀏覽器仍顯示 Vercel 登入頁。先前 integration rename API 403 已由擁有者在 GitHub 操作完成；沒有修改正式部署、刪除資料或更換憑證。
+正式網址 https://tagbible.vercel.app/ 已由擁有者完成綁定，檢查 HTTP200；在新版部署前仍為 EyeBible v0.9.2。擁有者已同意部署 TagBible 新版；目前正驗證 PR10 合併結果，完成後以實際 production HTTP 回應確認。Google 品牌／Supabase Site URL 與 redirect allowlist 後台尚未驗證，不宣稱登入回跳已切換。
+
+每日經文來源在 2026-11-23 顯示「每日經文系統維護中」，沒有當日 range；因此 importer 拒絕發布，保留 2026-11-20 最後成功資料。不可把舊經文改日期冒充今天。
 
 ## 切換順序
 
