@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-21",
+  "reference": "哥林多後書1:8-14",
+  "title": "今日經文",
+  "verses": [
+    {
+      "id": "2CO.1.8",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 8,
+      "reference": "哥林多後書 1:8",
+      "text": "弟兄們，我們不要你們不曉得，我們從前在亞西亞遭遇苦難，被壓太重，力不能勝，甚至連活命的指望都絕了；"
+    },
+    {
+      "id": "2CO.1.9",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 9,
+      "reference": "哥林多後書 1:9",
+      "text": "自己心裏也斷定是必死的，叫我們不靠自己，只靠叫死人復活的神。"
+    },
+    {
+      "id": "2CO.1.10",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 10,
+      "reference": "哥林多後書 1:10",
+      "text": "他曾救我們脫離那極大的死亡，現在仍要救我們，並且我們指望他將來還要救我們。"
+    },
+    {
+      "id": "2CO.1.11",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 11,
+      "reference": "哥林多後書 1:11",
+      "text": "你們以祈禱幫助我們，好叫許多人為我們謝恩，就是為我們因許多人所得的恩。"
+    },
+    {
+      "id": "2CO.1.12",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 12,
+      "reference": "哥林多後書 1:12",
+      "text": "我們所誇的是自己的良心，見證我們憑着神的聖潔和誠實；在世為人不靠人的聰明，乃靠神的恩惠，向你們更是這樣。"
+    },
+    {
+      "id": "2CO.1.13",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 13,
+      "reference": "哥林多後書 1:13",
+      "text": "我們現在寫給你們的話，並不外乎你們所念的，所認識的，我也盼望你們到底還是要認識；"
+    },
+    {
+      "id": "2CO.1.14",
+      "book": "哥林多後書",
+      "chapter": 1,
+      "verse": 14,
+      "reference": "哥林多後書 1:14",
+      "text": "正如你們已經有幾分認識我們，以我們誇口，好像我們在我們主耶穌的日子以你們誇口一樣。"
+    }
+  ],
+  "planSource": "https://www.youtube.com/watch?v=HcGDzXxS6L4",
+  "translation": "和合本（繁體、公版）",
+  "textSource": "https://raw.githubusercontent.com/seven1m/open-bibles/df3d5958933e0e1a62495fe95527b5949bb04a9f/chi-cuv.usfx.xml",
+  "licenseSource": "https://github.com/seven1m/open-bibles/blob/master/README.md"
+}
