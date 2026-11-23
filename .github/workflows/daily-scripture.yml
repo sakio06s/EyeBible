@@ -41,8 +41,19 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Resolve today's progress and verses without publishing
-        run: python3 scripts/update_daily.py --output "$RUNNER_TEMP/tagbible-source-check"
+      - name: Validate missing November 21 and 22 readings without publishing
+        run: |
+          python3 scripts/update_daily.py --date 2026-11-21 --output "$RUNNER_TEMP/tagbible-recover/2026-11-21"
+          python3 scripts/update_daily.py --date 2026-11-22 --output "$RUNNER_TEMP/tagbible-recover/2026-11-22"
+      - name: Report validated public-domain recovery records
+        run: |
+          python3 - <<'PYRECOVERY'
+          import os, pathlib, base64
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'tagbible-recover'
+          for day in ['2026-11-21','2026-11-22']:
+              record=(root/day/'daily'/(day+'.json')).read_bytes()
+              print('RECOVERY_JSON_BASE64:'+base64.b64encode(record).decode())
+          PYRECOVERY
 
   publish:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && !inputs.verify_only
