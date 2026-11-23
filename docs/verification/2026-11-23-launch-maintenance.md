@@ -1,0 +1,9 @@
+# Launch cleanup and admin creation verification
+
+Owner selected all groups public discussion/replies/Amens plus non-private personal archive copies, preserving private notes/highlights/completions/membership. Counts supplied by owner:13/4/3/1/14. Production DB remains unmodified by agent; owner-run SQL required after deployment.
+
+Dedicated postgres17-alpine container tagbible-maintenance-test, network none. Actual combined owner artifact tested end-to-end: counts checked under write locks; private backup not readable by authenticated/anon; no private-note content copied; all visible public discussion/reactions/archive copies cleared; exact private note/settings/highlight/checkin records retained; groups/members/completions/operation receipts retained; revisions incremented, stale saves rejected; delayed acknowledged post retry stays deleted; forged/nonadmin/anonymous create denied; administrator create succeeds. Repeated cleanup fails with expected count-changed guard and rolls back.
+
+Chromium/WebKit group-creation-gate, groups-ui, groups-edge pass. Ordinary/missing-capability UI disabled, invite preview preserved, admin can create, account change and late old-admin capability cannot enable new user. Scoped independent review found no critical/important issue; minor API-error mapping corrected in action handler and tested with sanitized403 response after refresh. Existing support admin registry is reused, no new admin assignments.
+
+Only client version0.15.9 is automatically deployed. SQL artifacts are not auto-executed. After owner execution, require zero visible/public count result and real-user retained-data confirmation. Backups/tombstone IDs intentionally retained; this is content cleanup with recovery, not irreversible erasure of all server copies. Unsent local drafts must be discarded before running.
