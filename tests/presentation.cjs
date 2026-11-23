@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
-const server = http.createServer((req,res) => {
+const server = http.createServer((req,res) => {if(require('./static-assets.cjs')(req,res))return;
   if(req.url.startsWith('/data/')){const date=req.url.match(/(\d{4}-\d{2}-\d{2})/)?.[1]||'2027-01-02';res.setHeader('Content-Type','application/json');return res.end(JSON.stringify({schemaVersion:1,date,reference:'約翰福音 3:11',title:'今日經文',verses:[{id:'JHN.3.11',book:'約翰福音',chapter:3,verse:11,reference:'約翰福音 3:11',text:'我們所說的是我們知道的。'}]}))}
   res.setHeader('Content-Type','text/html; charset=utf-8');
   res.end(fs.readFileSync(path.join(__dirname,'..','index.html')));
@@ -26,12 +26,12 @@ const server = http.createServer((req,res) => {
       const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
       await page.goto('http://127.0.0.1:'+server.address().port);
       await page.waitForFunction(()=>document.querySelector('#readingStatus').textContent.startsWith('今日經文 · 2027-01-02'));
-      assert(await page.getByRole('img',{name:'EyeBible',exact:true}).isVisible());
+      assert(await page.getByRole('img',{name:'TagBible',exact:true}).isVisible());
       assert.equal(await page.locator('.subbrand').count(),0);
       assert.equal(await page.locator('#todayDate').getAttribute('datetime'),'2027-01-02');
       const dateBox=await page.locator('#todayDate').boundingBox();assert(dateBox.y>=63&&dateBox.y+dateBox.height<700,'today must be visible without scrolling');
       assert.match(await page.locator('#todayDate').innerText(),/2027.*1.*2/);
-      assert.equal(await page.locator('#noteInput').getAttribute('placeholder'),'寫下你的感動、想法或疑問');
+      assert.equal(await page.locator('#noteInput').getAttribute('placeholder'),'寫下你對這段經文的感動、想法或疑問');
       await page.locator('.navbar [data-tab="profile"]').tap();
       await page.getByRole('button',{name:'暗色系',exact:true}).tap();
       assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');

@@ -1,0 +1,9 @@
+# Sticky group composer, independent sharing and private feedback
+
+User: sticky group sharing tile; distinct plain-text group composer (no scripture marker/private checkbox), placeholder寫下你想跟大家說的話. Equal action gaps. My Settings group card title我的小組 then name. Last settings card問題回報; authenticated submission emails hidden administrator. Reading note placeholder寫下你對這段經文的感動、想法或疑問.
+
+1. Separate group modal/draft/ownership from reading notes. General shares store kind=group/date=TODAY and send no reading field (SQLNULL accepted by existing RPC); exclude these from legacy scripture migration/history scripture labels. Preserve reading privacy/verse sharing.
+2. Sticky composer under fixed header, adjust anchors/pinning/read visibility for occupied height. Three action slots flex equally; content-left alignment gives equal gaps while keeping inline reaction counts. Header我的小組 then group name, management retained.
+3. Feedback dialog + account-scoped private draft, auth-required POST/api/feedback. Admin address/API key server environment only, no mailto/client recipient. Fixed provider endpoint, bounded content, server verifies Supabase user token; provider idempotency key for uncertain retry; user limit best effort per instance. Draft survives API errors, stale session response cannot affect new account.
+4. Email service/address not yet provided; asynchronous question pending. Prepare Resend transport as reversible default, do not claim live delivery until server environment is configured and delivery checked. No secrets in chat/repository, no external email sent as test without configured destination.
+5. Write failing UI/auth/API tests, execute inline, one fresh review after implementation. Fix important findings once; deploy preview only. Existing group SQL unchanged; if recipient/service remains missing, finish all independent code and clearly identify only configuration remaining.

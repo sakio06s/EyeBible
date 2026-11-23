@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const http = require('node:http');
 const htmlPath = require('node:path').join(__dirname, '..', 'index.html');
-const server = http.createServer((req,res) => {if(req.url.startsWith('/data/')){res.statusCode=404;res.setHeader('Content-Type','application/json');return res.end('{}')} res.setHeader('Content-Type','text/html; charset=utf-8');let html=fs.readFileSync(htmlPath,'utf8');if(req.url.includes('legacy'))html=html.replaceAll('100dvh','invalid');res.end(html);});
+const server = http.createServer((req,res) => {if(require('./static-assets.cjs')(req,res))return;if(req.url.startsWith('/data/')){res.statusCode=404;res.setHeader('Content-Type','application/json');return res.end('{}')} res.setHeader('Content-Type','text/html; charset=utf-8');let html=fs.readFileSync(htmlPath,'utf8');if(req.url.includes('legacy'))html=html.replaceAll('100dvh','invalid');res.end(html);});
 const legacy = {name:'測試',font:26,fullMarks:{'2026-11-17':{'1':'green'}},highlights:{'2026-11-17':{'1':[{start:0,end:3,color:'pink'}]}},notes:[{id:'old',date:'2026-11-17',text:'保留筆記',private:true}],checkins:{'2026-11-17':true}};
 function initialize(data){
   const NativeDate=Date;
