@@ -25,12 +25,22 @@ class FallbackTests(unittest.TestCase):
  def test_wrong_missing_ambiguous_invalid_date_rejected(self):
   for title in ['2026/11/22 阿摩司書8:1-3','2025/11/23 阿摩司書8:1-3','今日 阿摩司書8:1-3','2026/11/23 2026/11/24 阿摩司書8:1-3','2026/02/30 阿摩司書8:1-3']:
    with self.subTest(title=title),self.assertRaises(ValueError):m.parse_youtube_feed(feed(entry(title)),DAY)
+ def test_observed_live_feed_root_identity_and_title_format(self):
+  text=feed(entry('[活潑的生命] 20261123 含淚寫下的愛心勸勉(哥林多後書 2:1~11)'),channel=CHANNEL[2:])
+  self.assertEqual(m.parse_youtube_feed(text,DAY)[0],'哥林多後書2:1-11')
+ def test_irrelevant_today_video_does_not_hide_daily_progress(self):
+  self.assertEqual(m.parse_youtube_feed(feed(entry('2026/11/23 頻道公告'),entry()),DAY)[0],'阿摩司書8:1-3')
  def test_wrong_channel_and_malformed_feed_rejected(self):
   for text in [feed(entry(),channel='another'),feed(entry(channel='another')),feed(entry(video='bad')), '<feed/>','not xml']:
    with self.subTest(text=text),self.assertRaises(ValueError):m.parse_youtube_feed(text,DAY)
  def test_reference_missing_conflicting_and_multiple_today_rejected(self):
   for text in [feed(entry('2026/11/23 每日靈修')),feed(entry(description='經文：阿摩司書8:2-3')),feed(entry(),entry('2026/11/23 阿摩司書8:2-3',video='ABCDEFGHIJK'))]:
    with self.subTest(text=text),self.assertRaises(ValueError):m.parse_youtube_feed(text,DAY)
+ def test_unsupported_reference_does_not_publish_valid_prefix(self):
+  for ref in ['阿摩司書8:1至3','阿摩司書8:1-9999','阿摩司書8:1/3','阿摩司書8:1-3,9999']:
+   with self.subTest(ref=ref),self.assertRaises(ValueError):m.parse_youtube_feed(feed(entry('2026/11/23 '+ref)),DAY)
+ def test_conflicting_labelled_date_rejected_even_with_title_date(self):
+  with self.assertRaises(ValueError):m.parse_youtube_feed(feed(entry(description='讀經日期：2026/11/22')),DAY)
  def test_same_range_multiple_today_videos_ok(self):
   self.assertEqual(m.parse_youtube_feed(feed(entry(),entry(video='ABCDEFGHIJK')),DAY)[0],'阿摩司書8:1-3')
  def test_primary_valid_never_loads_backup(self):

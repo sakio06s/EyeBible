@@ -59,9 +59,18 @@ def reading_dates(text):
 def references_in(text):
     text = unicodedata.normalize('NFKC',unescape(text))
     books = '|'.join(re.escape(name) for name in sorted(BOOKS,key=len,reverse=True))
-    verse = r'\d{1,3}(?:\s*[-~∼–—－]\s*(?:\d{1,3}\s*:\s*)?\d{1,3})?'
-    pattern = r'(?:'+books+r')\s*\d{1,3}\s*:\s*'+verse+r'(?:\s*[,、;]\s*(?:\d{1,3}\s*:\s*)?'+verse+r')*(?![\d:])'
-    return {normalize_reference(match[0]) for match in re.finditer(pattern,text)}
+    # Capture the entire numeric continuation first; never accept a valid prefix
+    # of an unsupported range (e.g. 8:1至3 or 8:1-9999).
+    pattern = r'(?:'+books+r')\s*\d+\s*:\s*\d+(?:\s*[-~∼–—－至到,、;:/\\.]\s*\d+)*'
+    verse = r'\d{1,3}(?:-(?:\d{1,3}:)?\d{1,3})?'
+    supported = r'(?:'+books+r')\d{1,3}:'+verse+r'(?:[,;](?:\d{1,3}:)?'+verse+r')*'
+    refs = set()
+    for match in re.finditer(pattern,text):
+        ref = normalize_reference(match[0])
+        if not re.fullmatch(supported,ref):
+            raise ValueError('Unsupported complete scripture reference')
+        refs.add(ref)
+    return refs
 
 def parse_youtube_feed(text, expected_date):
     # The uploader's explicit reading date is authoritative, never upload order/date.
@@ -70,7 +79,7 @@ def parse_youtube_feed(text, expected_date):
         root = ET.fromstring(text)
     except ET.ParseError as error:
         raise ValueError('Invalid YouTube feed') from error
-    if root.tag != '{'+ns['a']+'}feed' or root.findtext('yt:channelId',namespaces=ns) != YOUTUBE_CHANNEL:
+    if root.tag != '{'+ns['a']+'}feed' or root.findtext('yt:channelId',namespaces=ns) not in {YOUTUBE_CHANNEL,YOUTUBE_CHANNEL[2:]}:
         raise ValueError('Unexpected YouTube channel')
     candidates = []
     for entry in root.findall('a:entry',ns):
@@ -82,10 +91,8 @@ def parse_youtube_feed(text, expected_date):
         title = entry.findtext('a:title',default='',namespaces=ns)
         description = entry.findtext('media:group/media:description',default='',namespaces=ns)
         try:
-            dates = reading_dates(title)
-            if not dates:
-                labelled_dates = re.findall(r'(?m)^\s*(?:日期|讀經日期|靈修日期)\s*[:：]\s*(.+)$',description)
-                dates = reading_dates(' '.join(labelled_dates))
+            labelled_dates = re.findall(r'(?m)^\s*(?:日期|讀經日期|靈修日期)\s*[:：]\s*(.+)$',description)
+            dates = reading_dates(title) | reading_dates(' '.join(labelled_dates))
         except ValueError:
             continue
         if dates != {expected_date}:
@@ -93,8 +100,10 @@ def parse_youtube_feed(text, expected_date):
         title_refs = references_in(title)
         lines = re.findall(r'(?m)^\s*(?:今日經文|讀經經文|讀經範圍|經文|經文進度|讀經進度)\s*[:：]\s*(.+)$',description)
         refs = title_refs | references_in(' '.join(lines))
+        if not refs:
+            continue
         if len(refs) != 1:
-            raise ValueError('Missing or ambiguous YouTube reading reference')
+            raise ValueError('Ambiguous YouTube reading reference')
         candidates.append((next(iter(refs)),'https://www.youtube.com/watch?v='+video))
     if not candidates or len({ref for ref,_ in candidates}) != 1:
         raise ValueError('No unambiguous YouTube reading for '+expected_date.isoformat())
