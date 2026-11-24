@@ -27,7 +27,7 @@ WebKit tests are engine checks, not a substitute for a final check on an actual 
 
 `interface.cjs` checks the annotated onboarding and reading-screen changes, compact retry control, local checkin names/avatars, circular centered photo uploads, and concise floating-toolbar/note titles.
 
-`social.cjs` checks the real seven-day feed boundary in Taipei, private/own activity exclusion, unread persistence, inline reply drafts, Amen toggles, local member completion and glow levels 1–5, duplicate dates, missing-day decay, midnight rollover and narrow light/dark layouts.
+`social.cjs` checks the real seven-day feed boundary in Taipei, private/own activity exclusion, unread persistence, inline reply drafts, Amen toggles, local member completion and glow levels 1–10, duplicate dates, missing-day decay, midnight rollover and narrow light/dark layouts.
 
 `refinements.cjs` verifies 20% smaller logo with transparent dark treatment, equal annotation buttons, concise prompts, one group composer, historical reading dates/full verse excerpts, and visible emoji pixel centering.
 
@@ -65,7 +65,7 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 
 `recent-reading.cjs` 驗證今天／昨天／前天原生選單、台北跨月／年、補讀快取與日期別筆記／標註／小組簽到、快速操作與失敗重試、換帳號，以及所有歷史入口的補簽窗口；`recent-reading-edges.cjs` 驗證正式每日與共享快照區分、筆記跳轉取消舊請求、背景fallback隔離、午夜忙碌清理、寫作中延後載入、精確選項文字與帳號載入提示。兩者執行Chromium／WebKit。
 
-`member-streak.cjs` 驗證本機／雲端小組頭像狀態：連續1～3天與4天以上、1000天不封頂、中斷／重複／未來／無效日期、補簽接回、跨日與無障礙文字；維持既有5級發光。Chromium／WebKit皆執行。
+`member-streak.cjs` 驗證本機／雲端小組頭像狀態：連續1～3天與4天以上、1000天不封頂、中斷／重複／未來／無效日期、補簽接回、跨日與無障礙文字；10級發光、綠色／金黃色切換、30天獎牌與漏讀滿3個完整日失效。Chromium／WebKit皆執行。
 
 `public-info.cjs` 驗證公開介紹／隱私／條款在無JavaScript、亮暗色320px畫面可讀，沒有SDK／Auth依賴、首頁政策互鏈、歡迎／設定入口、個資說明與刪除後伺服器保留原文的揭露。Chromium／WebKit執行。
 
