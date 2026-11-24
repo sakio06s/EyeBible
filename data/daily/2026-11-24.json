@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-24",
+  "reference": "哥林多後書2:12-17",
+  "title": "今日經文",
+  "verses": [
+    {
+      "id": "2CO.2.12",
+      "book": "哥林多後書",
+      "chapter": 2,
+      "verse": 12,
+      "reference": "哥林多後書 2:12",
+      "text": "我從前為基督的福音到了特羅亞，主也給我開了門。"
+    },
+    {
+      "id": "2CO.2.13",
+      "book": "哥林多後書",
+      "chapter": 2,
+      "verse": 13,
+      "reference": "哥林多後書 2:13",
+      "text": "那時，因為沒有遇見兄弟提多，我心裏不安，便辭別那裏的人往馬其頓去了。"
+    },
+    {
+      "id": "2CO.2.14",
+      "book": "哥林多後書",
+      "chapter": 2,
+      "verse": 14,
+      "reference": "哥林多後書 2:14",
+      "text": "感謝神！常帥領我們在基督裏誇勝，並藉着我們在各處顯揚那因認識基督而有的香氣。"
+    },
+    {
+      "id": "2CO.2.15",
+      "book": "哥林多後書",
+      "chapter": 2,
+      "verse": 15,
+      "reference": "哥林多後書 2:15",
+      "text": "因為我們在神面前，無論在得救的人身上或滅亡的人身上，都有基督馨香之氣。"
+    },
+    {
+      "id": "2CO.2.16",
+      "book": "哥林多後書",
+      "chapter": 2,
+      "verse": 16,
+      "reference": "哥林多後書 2:16",
+      "text": "在這等人，就作了死的香氣叫他死；在那等人，就作了活的香氣叫他活。這事誰能當得起呢？"
+    },
+    {
+      "id": "2CO.2.17",
+      "book": "哥林多後書",
+      "chapter": 2,
+      "verse": 17,
+      "reference": "哥林多後書 2:17",
+      "text": "我們不像那許多人，為利混亂神的道；乃是由於誠實，由於神，在神面前憑着基督講道。"
+    }
+  ],
+  "planSource": "https://www.youtube.com/watch?v=NxC8bncj76o",
+  "translation": "和合本（繁體、公版）",
+  "textSource": "https://raw.githubusercontent.com/seven1m/open-bibles/df3d5958933e0e1a62495fe95527b5949bb04a9f/chi-cuv.usfx.xml",
+  "licenseSource": "https://github.com/seven1m/open-bibles/blob/master/README.md"
+}
