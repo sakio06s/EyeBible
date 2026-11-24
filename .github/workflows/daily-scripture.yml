@@ -5,6 +5,8 @@ on:
     # UTC 16:05/16:35/20:05 = Asia/Taipei 00:05/00:35/04:05.
     - cron: '5,35 16 * * *'
     - cron: '5 20 * * *'
+    # Retry away from the busy top of the hour if an earlier schedule was missed.
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       verify_only:
@@ -59,9 +61,22 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+      - name: Check whether today's reading still needs publishing
+        id: daily
+        shell: bash
+        run: |
+          reading_date=$(TZ=Asia/Taipei date +%F)
+          if [[ "${{ github.event_name }}" == 'schedule' && -s "data/daily/$reading_date.json" ]]; then
+            echo 'needed=false' >> "$GITHUB_OUTPUT"
+            echo "Reading for $reading_date is already published."
+          else
+            echo 'needed=true' >> "$GITHUB_OUTPUT"
+          fi
       - name: Fetch and validate today's reference and public-domain scripture
+        if: steps.daily.outputs.needed == 'true'
         run: python3 scripts/update_daily.py
       - name: Publish validated data atomically through one commit
+        if: steps.daily.outputs.needed == 'true'
         shell: bash
         run: |
           git add data/daily data/latest.json data/sync-status.json
