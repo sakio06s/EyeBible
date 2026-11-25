@@ -1,99 +1,67 @@
 {
   "schemaVersion": 1,
-  "date": "2026-11-25",
-  "reference": "哥林多後書3:1-11",
+  "date": "2026-11-26",
+  "reference": "哥林多後書3:12-18",
   "title": "今日經文",
   "verses": [
     {
-      "id": "2CO.3.1",
+      "id": "2CO.3.12",
       "book": "哥林多後書",
       "chapter": 3,
-      "verse": 1,
-      "reference": "哥林多後書 3:1",
-      "text": "我們豈是又舉薦自己嗎？豈像別人用人的薦信給你們或用你們的薦信給人嗎？"
+      "verse": 12,
+      "reference": "哥林多後書 3:12",
+      "text": "我們既有這樣的盼望，就大膽講說，"
     },
     {
-      "id": "2CO.3.2",
+      "id": "2CO.3.13",
       "book": "哥林多後書",
       "chapter": 3,
-      "verse": 2,
-      "reference": "哥林多後書 3:2",
-      "text": "你們就是我們的薦信，寫在我們的心裏，被眾人所知道所念誦的。"
+      "verse": 13,
+      "reference": "哥林多後書 3:13",
+      "text": "不像摩西將帕子蒙在臉上，叫以色列人不能定睛看到那將廢者的結局。"
     },
     {
-      "id": "2CO.3.3",
+      "id": "2CO.3.14",
       "book": "哥林多後書",
       "chapter": 3,
-      "verse": 3,
-      "reference": "哥林多後書 3:3",
-      "text": "你們明顯是基督的信，藉着我們修成的。不是用墨寫的，乃是用永生神的靈寫的；不是寫在石版上，乃是寫在心版上。"
+      "verse": 14,
+      "reference": "哥林多後書 3:14",
+      "text": "但他們的心地剛硬，直到今日誦讀舊約的時候，這帕子還沒有揭去。這帕子在基督裏已經廢去了。"
     },
     {
-      "id": "2CO.3.4",
+      "id": "2CO.3.15",
       "book": "哥林多後書",
       "chapter": 3,
-      "verse": 4,
-      "reference": "哥林多後書 3:4",
-      "text": "我們因基督，所以在神面前纔有這樣的信心。"
+      "verse": 15,
+      "reference": "哥林多後書 3:15",
+      "text": "然而直到今日，每逢誦讀摩西書的時候，帕子還在他們心上。"
     },
     {
-      "id": "2CO.3.5",
+      "id": "2CO.3.16",
       "book": "哥林多後書",
       "chapter": 3,
-      "verse": 5,
-      "reference": "哥林多後書 3:5",
-      "text": "並不是我們憑自己能承擔甚麼事；我們所能承擔的，乃是出於神。"
+      "verse": 16,
+      "reference": "哥林多後書 3:16",
+      "text": "但他們的心幾時歸向主，帕子就幾時除去了。"
     },
     {
-      "id": "2CO.3.6",
+      "id": "2CO.3.17",
       "book": "哥林多後書",
       "chapter": 3,
-      "verse": 6,
-      "reference": "哥林多後書 3:6",
-      "text": "他叫我們能承當這新約的執事，不是憑着字句，乃是憑着精意；因為那字句是叫人死，精意〔或作：聖靈〕是叫人活。"
+      "verse": 17,
+      "reference": "哥林多後書 3:17",
+      "text": "主就是那靈；主的靈在那裏，那裏就得以自由。"
     },
     {
-      "id": "2CO.3.7",
+      "id": "2CO.3.18",
       "book": "哥林多後書",
       "chapter": 3,
-      "verse": 7,
-      "reference": "哥林多後書 3:7",
-      "text": "那用字刻在石頭上屬死的職事尚且有榮光，甚至以色列人因摩西面上的榮光，不能定睛看他的臉；這榮光原是漸漸退去的，"
-    },
-    {
-      "id": "2CO.3.8",
-      "book": "哥林多後書",
-      "chapter": 3,
-      "verse": 8,
-      "reference": "哥林多後書 3:8",
-      "text": "何況那屬靈的職事豈不更有榮光嗎？"
-    },
-    {
-      "id": "2CO.3.9",
-      "book": "哥林多後書",
-      "chapter": 3,
-      "verse": 9,
-      "reference": "哥林多後書 3:9",
-      "text": "若是定罪的職事有榮光，那稱義的職事榮光就越發大了。"
-    },
-    {
-      "id": "2CO.3.10",
-      "book": "哥林多後書",
-      "chapter": 3,
-      "verse": 10,
-      "reference": "哥林多後書 3:10",
-      "text": "那從前有榮光的，因這極大的榮光就算不得有榮光了；"
-    },
-    {
-      "id": "2CO.3.11",
-      "book": "哥林多後書",
-      "chapter": 3,
-      "verse": 11,
-      "reference": "哥林多後書 3:11",
-      "text": "若那廢掉的有榮光，這長存的就更有榮光了。"
+      "verse": 18,
+      "reference": "哥林多後書 3:18",
+      "text": "我們眾人既然敞着臉，得以看見主的榮光，好像從鏡子裏返照，就變成主的形狀，榮上加榮，如同從主的靈變成的。"
     }
   ],
-  "planSource": "https://www.youtube.com/watch?v=DFORu6aPjFI",
+  "planSource": "https://www.youtube.com/watch?v=2xVdnKuKrEg",
   "translation": "和合本（繁體、公版）",
   "textSource": "https://raw.githubusercontent.com/seven1m/open-bibles/df3d5958933e0e1a62495fe95527b5949bb04a9f/chi-cuv.usfx.xml",
   "licenseSource": "https://github.com/seven1m/open-bibles/blob/master/README.md"
