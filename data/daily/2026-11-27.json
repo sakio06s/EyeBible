@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-27",
+  "reference": "哥林多後書4:1-10",
+  "title": "今日經文",
+  "verses": [
+    {
+      "id": "2CO.4.1",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 1,
+      "reference": "哥林多後書 4:1",
+      "text": "我們既然蒙憐憫，受了這職分，就不喪膽，"
+    },
+    {
+      "id": "2CO.4.2",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 2,
+      "reference": "哥林多後書 4:2",
+      "text": "乃將那些暗昧可恥的事棄絕了；不行詭詐，不謬講神的道理，只將真理表明出來，好在神面前把自己薦與各人的良心。"
+    },
+    {
+      "id": "2CO.4.3",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 3,
+      "reference": "哥林多後書 4:3",
+      "text": "如果我們的福音蒙蔽，就是蒙蔽在滅亡的人身上。"
+    },
+    {
+      "id": "2CO.4.4",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 4,
+      "reference": "哥林多後書 4:4",
+      "text": "此等不信之人被這世界的神弄瞎了心眼，不叫基督榮耀福音的光照着他們。基督本是神的像。"
+    },
+    {
+      "id": "2CO.4.5",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 5,
+      "reference": "哥林多後書 4:5",
+      "text": "我們原不是傳自己，乃是傳基督耶穌為主，並且自己因耶穌作你們的僕人。"
+    },
+    {
+      "id": "2CO.4.6",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 6,
+      "reference": "哥林多後書 4:6",
+      "text": "那吩咐光從黑暗裏照出來的神，已經照在我們心裏，叫我們得知神榮耀的光顯在耶穌基督的面上。"
+    },
+    {
+      "id": "2CO.4.7",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 7,
+      "reference": "哥林多後書 4:7",
+      "text": "我們有這寶貝放在瓦器裏，要顯明這莫大的能力是出於神，不是出於我們。"
+    },
+    {
+      "id": "2CO.4.8",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 8,
+      "reference": "哥林多後書 4:8",
+      "text": "我們四面受敵，卻不被困住；心裏作難，卻不至失望；"
+    },
+    {
+      "id": "2CO.4.9",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 9,
+      "reference": "哥林多後書 4:9",
+      "text": "遭逼迫，卻不被丟棄；打倒了，卻不至死亡。"
+    },
+    {
+      "id": "2CO.4.10",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 10,
+      "reference": "哥林多後書 4:10",
+      "text": "身上常帶着耶穌的死，使耶穌的生也顯明在我們身上。"
+    }
+  ],
+  "planSource": "https://www.youtube.com/watch?v=uvoiEUxyuYE",
+  "translation": "和合本（繁體、公版）",
+  "textSource": "https://raw.githubusercontent.com/seven1m/open-bibles/df3d5958933e0e1a62495fe95527b5949bb04a9f/chi-cuv.usfx.xml",
+  "licenseSource": "https://github.com/seven1m/open-bibles/blob/master/README.md"
+}
