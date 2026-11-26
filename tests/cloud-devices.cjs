@@ -52,17 +52,22 @@ const server=http.createServer((req,res)=>{
   assert.equal(await second.evaluate(()=>state.checkins[readingKey]),true);
   assert.equal(await second.evaluate(()=>state.notes.find(n=>n.text==='跨瀏覽器私人筆記').private),true);
   assert.equal(await second.locator('#feed').innerText().then(t=>t.includes('跨瀏覽器私人筆記')),false);
+  await first.locator('.navbar [data-tab="history"]').click();
+  await first.locator(`[data-date="${fixture.date}"]`).click();
+  await first.locator('#historyDetails [data-edit-note]').click();await first.locator('#textEditInput').fill('跨瀏覽器修改後的私人筆記');await first.locator('#saveTextEdit').click();
+  await first.waitForFunction(()=>document.querySelector('#cloudStatus').textContent==='已同步到雲端');
+  await second.evaluate(()=>document.querySelector('#syncAccount').click());await second.waitForFunction(()=>state.notes.some(n=>n.text==='跨瀏覽器修改後的私人筆記'&&n.private));
   // Independent edits on both devices must survive the next pull/merge.
   await first.evaluate(()=>{state.fullMarks[readingKey][2]='pink';save()});
   await second.evaluate(()=>{state.notes.unshift({id:'webkit-note',authorId:state.userId,date:TODAY,text:'另一裝置新增的筆記',private:true});save()});
   await Promise.all([first,second].map(p=>p.waitForFunction(()=>document.querySelector('#cloudStatus').textContent==='已同步到雲端')));
   for(const page of [first,second]){await page.evaluate(()=>document.querySelector('#syncAccount').click());await page.waitForFunction(()=>state.fullMarks[readingKey]?.[2]==='pink'&&state.notes.some(n=>n.id==='webkit-note'))}
   const other=await device(chromium,B);
-  assert.equal(await other.evaluate(()=>state.notes.some(n=>n.text==='跨瀏覽器私人筆記'||n.id==='webkit-note')),false);
+  assert.equal(await other.evaluate(()=>state.notes.some(n=>n.text.includes('跨瀏覽器')||n.id==='webkit-note')),false);
   assert.equal(await other.evaluate(()=>Object.values(state.checkins).some(Boolean)),false);
   await first.evaluate(()=>document.querySelector('#logoutAccount').click());
   await first.waitForFunction(()=>!localStorage.getItem('eyebible.cloud.owner'));
-  assert.equal(await first.evaluate(()=>state.notes.some(n=>n.text==='跨瀏覽器私人筆記')),false);
+  assert.equal(await first.evaluate(()=>state.notes.some(n=>n.text.includes('跨瀏覽器'))),false);
   console.log('PASS independent Chromium/WebKit devices: mark + private note + checkin roundtrip, concurrent independent edits, other-account exclusion, logout workspace cleanup');
  }finally{await Promise.all(contexts.map(c=>c.close()));await Promise.all(browsers.map(b=>b.close()))}
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>server.close());

@@ -72,3 +72,6 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `python3 -m unittest discover -s tests -p "test_*.py"` 包含官網優先／指定 YouTube 頻道備援、日期／參考範圍／頻道驗證、來源恢復後不可變紀錄、CLI 錯誤不覆寫。`node tests/progress-source.cjs` 驗證來源連結與不可信 URL 拒絕。
 
 `node tests/group-creation-gate.cjs` 驗證管理者建立權限、一般／升級缺漏預設關閉、邀請加入、跨帳號與過期管理者能力、權限拒絕提示。`sh tests/maintenance-db.sh` 只使用 `tagbible-maintenance-test` 隔離容器，執行實際合併維護 SQL，驗證盤點保護、私有備份、資料保留、延遲重送及資料庫權限。
+
+`edit-ui.cjs` checks owner-only note/post/reply editing, personal/shared synchronization, immutable metadata, failed-save draft preservation, cancel/account cleanup and uniform single-line roster fonts in Chromium/WebKit. `edit-text.sql` runs only in a disposable PostgreSQL fixture after `cloud/upgrade-text-editing.sql` and verifies author enforcement (including group-leader rejection), optimistic conflict detection, idempotency, personal-copy sync/privacy, deleted content and anonymous access.
+`edit-rpc-integration.cjs` uses the shipped Supabase SDK and account wrapper to verify authenticated edit RPC forwarding and the allowlist. `cloud-devices.cjs` also verifies a private-note edit reaches an independent WebKit device.
