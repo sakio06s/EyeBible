@@ -75,3 +75,5 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 
 `edit-ui.cjs` checks owner-only note/post/reply editing, personal/shared synchronization, immutable metadata, failed-save draft preservation, cancel/account cleanup and uniform single-line roster fonts in Chromium/WebKit. `edit-text.sql` runs only in a disposable PostgreSQL fixture after `cloud/upgrade-text-editing.sql` and verifies author enforcement (including group-leader rejection), optimistic conflict detection, idempotency, personal-copy sync/privacy, deleted content and anonymous access.
 `edit-rpc-integration.cjs` uses the shipped Supabase SDK and account wrapper to verify authenticated edit RPC forwarding and the allowlist. `cloud-devices.cjs` also verifies a private-note edit reaches an independent WebKit device.
+
+留言操作更新的 `edit-ui.cjs` 亦檢查四個留言操作順序與等距、回覆按鈕同字體字級、無下拉選單的同步勾選、取消／重新勾選、全體已連結副本同步、編輯視窗刪除保留筆記，並驗證不相容雲端在送出修改前被阻擋。SQL fixture 另驗證同步 opt-out 與各份原文版本。
