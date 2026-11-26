@@ -77,3 +77,5 @@ Run `sh tests/cloud-db.sh` only against the disposable `eyebible-cloud-test` Doc
 `edit-rpc-integration.cjs` uses the shipped Supabase SDK and account wrapper to verify authenticated edit RPC forwarding and the allowlist. `cloud-devices.cjs` also verifies a private-note edit reaches an independent WebKit device.
 
 留言操作更新的 `edit-ui.cjs` 亦檢查四個留言操作順序與等距、回覆按鈕同字體字級、無下拉選單的同步勾選、取消／重新勾選、全體已連結副本同步、編輯視窗刪除保留筆記，並驗證不相容雲端在送出修改前被阻擋。SQL fixture 另驗證同步 opt-out 與各份原文版本。
+
+`study-export-core.cjs` checks inclusive dates, book ordering, own-note privacy, full/partial highlight preservation, mixed-book/verse-specific scope, cross-chapter and repeated-book references. `study-export-files.cjs` checks genuine DOCX ZIP/XML/escaping/shading and searchable, multi-page Chinese PDF; raster ink checks catch invisible glyphs that text extraction misses. It needs fontTools-generated bundled font plus local Python PyMuPDF and Poppler test utilities. `study-export-ui.cjs` checks real Word/PDF downloads in Chromium/WebKit at 320px, 25 posts with 205 replies, dates/book exclusion, empty/error/cursor validation, live reorder detection and cancellation during both network and PDF font preparation.

@@ -1,0 +1,5 @@
+# Study export
+
+Approved in conversation: add 匯出筆記 to 讀經足跡. Search by inclusive date range or one of 66 Bible books without date limits. Content modes: marked scripture and references only; scripture plus own personal notes (including private); all current-group public posts and complete replies. Export Word (.docx) and PDF (.pdf), keeping highlight colors. Full Chinese book names plus a space and chapter:verse, en dash ranges and ideographic comma disjoint verses. Date mode sorts dates; book mode sorts scripture then note dates. Group date mode selects parent post dates in Taipei and includes all their replies; book mode excludes unlinked general chat.
+
+Implementation choice: generate both formats entirely in the browser. Minimal OOXML ZIP writer avoids a Word library. PDF uses pinned, bundled pdf-lib/fontkit and a licensed Traditional Chinese font. Existing group_feed and group_read(replies) provide paginated member-authorized data; no new SQL. Do not export other users' personal/private notes, tokens, invite codes or internal account metadata. Fail on incomplete pages, cancellation, or account/group change rather than download partial data.
