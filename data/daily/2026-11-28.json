@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-28",
+  "reference": "哥林多後書4:11-18",
+  "title": "今日經文",
+  "verses": [
+    {
+      "id": "2CO.4.11",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 11,
+      "reference": "哥林多後書 4:11",
+      "text": "因為我們這活着的人是常為耶穌被交於死地，使耶穌的生在我們這必死的身上顯明出來。"
+    },
+    {
+      "id": "2CO.4.12",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 12,
+      "reference": "哥林多後書 4:12",
+      "text": "這樣看來，死是在我們身上發動，生卻在你們身上發動。"
+    },
+    {
+      "id": "2CO.4.13",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 13,
+      "reference": "哥林多後書 4:13",
+      "text": "但我們既有信心，正如經上記着說：『我因信，所以如此說話。』我們也信，所以也說話。"
+    },
+    {
+      "id": "2CO.4.14",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 14,
+      "reference": "哥林多後書 4:14",
+      "text": "自己知道那叫主耶穌復活的，也必叫我們與耶穌一同復活，並且叫我們與你們一同站在他面前。"
+    },
+    {
+      "id": "2CO.4.15",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 15,
+      "reference": "哥林多後書 4:15",
+      "text": "凡事都是為你們，好叫恩惠因人多越發加增，感謝格外顯多，以致榮耀歸與神。"
+    },
+    {
+      "id": "2CO.4.16",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 16,
+      "reference": "哥林多後書 4:16",
+      "text": "所以，我們不喪膽。外體雖然毀壞，內心卻一天新似一天。"
+    },
+    {
+      "id": "2CO.4.17",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 17,
+      "reference": "哥林多後書 4:17",
+      "text": "我們這至暫至輕的苦楚，要為我們成就極重無比、永遠的榮耀。"
+    },
+    {
+      "id": "2CO.4.18",
+      "book": "哥林多後書",
+      "chapter": 4,
+      "verse": 18,
+      "reference": "哥林多後書 4:18",
+      "text": "原來我們不是顧念所見的，乃是顧念所不見的；因為所見的是暫時的，所不見的是永遠的。"
+    }
+  ],
+  "planSource": "https://www.youtube.com/watch?v=Pt4r6rQn0O0",
+  "translation": "和合本（繁體、公版）",
+  "textSource": "https://raw.githubusercontent.com/seven1m/open-bibles/df3d5958933e0e1a62495fe95527b5949bb04a9f/chi-cuv.usfx.xml",
+  "licenseSource": "https://github.com/seven1m/open-bibles/blob/master/README.md"
+}
